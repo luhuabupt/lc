@@ -1,4 +1,4 @@
-package _020
+package main
 
 import "sort"
 
@@ -18,6 +18,41 @@ func splitPainting(segments [][]int) [][]int64 {
 			ans = append(ans, []int64{int64(list[k-1]), int64(v), sum})
 		}
 		sum += diff[v]
+	}
+	return ans
+}
+
+func splitPainting_(segments [][]int) [][]int64 {
+	ans := [][]int64{}
+	sort.Slice(segments, func(i, j int) bool {
+		return segments[i][0] < segments[j][0]
+	})
+	pm, points := map[int]bool{}, []int{}
+	for _, arr := range segments {
+		pm[arr[0]], pm[arr[1]] = true, true
+	}
+	for k, _ := range pm {
+		points = append(points, k)
+	}
+	sort.Ints(points)
+	sum, preSum, stack, idx, stackIdx := int64(0), int64(0), []int{}, 0, 0
+	for k, point := range points {
+		for i := stackIdx; i < len(stack); i++ {
+			seg := stack[stackIdx]
+			if segments[seg][1] <= point {
+				sum -= int64(segments[seg][2])
+				stackIdx++
+			}
+		}
+		for idx < len(segments) && segments[idx][0] <= point {
+			sum += int64(segments[idx][2])
+			stack = append(stack, idx)
+			idx++
+		}
+		if k > 0 && preSum > 0 {
+			ans = append(ans, []int64{int64(points[k-1]), int64(point), preSum})
+		}
+		preSum = sum
 	}
 	return ans
 }
