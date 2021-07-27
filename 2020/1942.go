@@ -6,10 +6,10 @@ import (
 	"sort"
 )
 
-type hp struct{ sort.IntSlice }
+type hs struct{ sort.IntSlice }
 
-func (h *hp) Push(v interface{}) { h.IntSlice = append(h.IntSlice, v.(int)) }
-func (h *hp) Pop() interface{} {
+func (h *hs) Push(v interface{}) { h.IntSlice = append(h.IntSlice, v.(int)) }
+func (h *hs) Pop() interface{} {
 	a := h.IntSlice
 	v := a[len(a)-1]
 	h.IntSlice = a[:len(a)-1]
