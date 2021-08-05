@@ -3,7 +3,6 @@ package main
 import (
 	"container/heap"
 	"fmt"
-	"strconv"
 )
 
 type pair struct {
@@ -19,8 +18,8 @@ func (h *hp) Push(v interface{}) { *h = append(*h, v.(pair)) }
 func (h *hp) Pop() interface{}   { a := *h; v := a[len(a)-1]; *h = a[:len(a)-1]; return v }
 
 func main() {
-	fmt.Println(string(25))
-	fmt.Println(strconv.Itoa(25))
+	a := map[int]int{}
+	fmt.Println(a[0] > 1)
 }
 
 func topKFrequent(words []string, k int) []string {
