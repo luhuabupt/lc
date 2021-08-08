@@ -231,3 +231,34 @@ func eventualSafeNodes(graph [][]int) []int {
 
 	return ans
 }
+
+// https://leetcode-cn.com/problems/shortest-path-visiting-all-nodes/
+// 847. 访问所有节点的最短路径
+// 图 广度优先
+func shortestPathLength(graph [][]int) int {
+	n := len(graph)
+	type tuple struct{ u, mask, dist int }
+	q := []tuple{}
+	seen := []map[int]bool{}
+
+	for i := 0; i < n; i++ {
+		q = append(q, tuple{i, 1 << i, 0})
+		seen = append(seen, map[int]bool{1 << i: true})
+	}
+
+	for {
+		//t, q := q[0], q[1:]
+		t := q[0]
+		q = q[1:]
+		if t.mask == (1<<n)-1 {
+			return t.dist
+		}
+		for _, v := range graph[t.u] {
+			mask := (1 << v) | t.mask
+			if !seen[v][mask] {
+				seen[v][mask] = true
+				q = append(q, tuple{v, mask, t.dist + 1})
+			}
+		}
+	}
+}
