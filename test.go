@@ -3,6 +3,7 @@ package main
 import (
 	"container/heap"
 	"fmt"
+	"sort"
 )
 
 type pair struct {
@@ -18,8 +19,17 @@ func (h *hp) Push(v interface{}) { *h = append(*h, v.(pair)) }
 func (h *hp) Pop() interface{}   { a := *h; v := a[len(a)-1]; *h = a[:len(a)-1]; return v }
 
 func main() {
-	a := map[int]int{}
-	fmt.Println(a[0] > 1)
+
+}
+
+func testVar() {
+	a := []int{0, 1, 2, 3}
+	for len(a) > 0 {
+		var t int
+		t, a = a[0], a[1:]
+		t, a := a[0], a[1:]
+		fmt.Println(t, a)
+	}
 }
 
 func topKFrequent(words []string, k int) []string {
@@ -39,4 +49,30 @@ func topKFrequent(words []string, k int) []string {
 		ans[i] = heap.Pop(h).(pair).w
 	}
 	return ans
+}
+
+func isPrefixString(s string, words []string) bool {
+	idx := 0
+	for _, str := range words {
+		if idx+len(str) > len(s) {
+			return false
+		}
+		for i := 0; i < len(str); i++ {
+			if str[i] != s[idx] {
+				return false
+			}
+			idx++
+		}
+		if idx == len(s) {
+			return true
+		}
+	}
+	return idx == len(s)
+}
+
+func minStoneSum(piles []int, k int) int {
+	sort.Ints(piles)
+	for i := len(piles) - 1; i >= 0; i++ {
+
+	}
 }
