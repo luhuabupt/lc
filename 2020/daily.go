@@ -231,3 +231,20 @@ func eventualSafeNodes(graph [][]int) []int {
 
 	return ans
 }
+
+func numberOfArithmeticSlices(nums []int) int {
+	if len(nums) < 3 {
+		return 0
+	}
+	diff, ans, t := nums[1]-nums[0], 0, 0
+	nums = append(nums, 3000)
+	for i := 2; i < len(nums); i++ {
+		if diff == nums[i]-nums[i-1] {
+			t++
+		} else {
+			t, diff = 0, nums[i]-nums[i-1]
+		}
+		ans += t
+	}
+	return ans
+}
