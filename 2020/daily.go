@@ -509,3 +509,27 @@ func checkRecord(n int) int {
 	}
 	return ans
 }
+
+// hello
+func reverseVowels(s string) string {
+	arr, m := []byte(s), map[byte]bool{'a': true, 'e': true, 'i': true, 'o': true, 'u': true, 'A': true, 'E': true, 'I': true, 'O': true, 'U': true}
+	i, j := 0, len(s)-1
+	for {
+		for !m[arr[i]] {
+			if i == len(s)-1 {
+				return string(arr)
+			}
+			i++
+		}
+		for !m[arr[j]] {
+			j--
+		}
+		if i >= j {
+			break
+		}
+		arr[i], arr[j] = arr[j], arr[i]
+		i++
+		j--
+	}
+	return string(arr)
+}
