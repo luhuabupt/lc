@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"sort"
 )
 
@@ -8,6 +9,10 @@ type TreeNode struct {
 	Val   int
 	Left  *TreeNode
 	Right *TreeNode
+}
+
+func main() {
+	fmt.Println(countArrangement(15))
 }
 
 // 863 二叉树中所有距离为 K 的结点
@@ -172,7 +177,7 @@ func triangleNumber(nums []int) int {
 // 802. 找到最终的安全状态
 // 三色标记 | 拓扑排序
 func eventualSafeNodes_(graph [][]int) []int {
-	color := map[int]int{}
+	color := map[int]int{} // 0-未访问, 1-访问过, 2-安全
 	var safe func(x int) bool
 	safe = func(x int) bool {
 		if len(graph[x]) == 0 || color[x] == 2 {
@@ -183,7 +188,7 @@ func eventualSafeNodes_(graph [][]int) []int {
 		}
 		color[x] = 1
 		for _, v := range graph[x] {
-			if color[v] == 1 || !safe(v) {
+			if !safe(v) {
 				return false
 			}
 		}
@@ -232,7 +237,7 @@ func eventualSafeNodes(graph [][]int) []int {
 	return ans
 }
 
-func numberOfArithmeticSlices(nums []int) int {
+func numberOfArithmeticSlices_(nums []int) int {
 	if len(nums) < 3 {
 		return 0
 	}
@@ -278,4 +283,229 @@ func shortestPathLength(graph [][]int) int {
 			}
 		}
 	}
+}
+
+// https://leetcode-cn.com/problems/minimum-total-space-wasted-with-k-resizing-operations/
+func minSpaceWastedKResizing(nums []int, k int) int {
+	n := len(nums)
+	dp, g, w, sum := make([][]int, n), make([][]int, n), make([][]int, n), 0
+	for i := 0; i < n; i++ {
+		g[i] = make([]int, n)
+		w[i] = make([]int, n+1)
+	}
+	for i := n - 1; i >= 0; i-- {
+		g[i][i], sum = nums[i], nums[i]
+		for x := i - 1; x >= 0; x-- {
+			sum += nums[x]
+			g[x][i] = maxTwo(g[x+1][i], nums[x])
+			w[x][i] = g[x][i]*(i-x+1) - sum
+		}
+	}
+
+	for i := 0; i < n; i++ {
+		dp[i] = make([]int, k+1)
+		dp[i][0] = w[0][i]
+		for j := 1; j <= k; j++ {
+			dp[i][j] = w[1][i]
+			for x := 1; x <= i-1; x++ {
+				dp[i][j] = minTwo(dp[x][j-1]+w[x+1][i], dp[i][j])
+			}
+			dp[i][j] = minTwo(dp[i][j], dp[i][j-1])
+		}
+	}
+
+	return dp[n-1][k]
+}
+
+func maxTwo(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+func minTwo(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+// https://leetcode-cn.com/problems/finding-the-users-active-minutes/
+func findingUsersActiveMinutes(logs [][]int, k int) []int {
+	m, u, ans := map[int]map[int]bool{}, map[int]int{}, make([]int, k)
+	for _, arr := range logs {
+		if m[arr[0]] == nil {
+			m[arr[0]] = map[int]bool{}
+		}
+		if !m[arr[0]][arr[1]] {
+			m[arr[0]][arr[1]] = true
+			u[arr[0]]++
+		}
+	}
+
+	for _, num := range u {
+		ans[num-1]++
+	}
+
+	return ans
+}
+
+// https://leetcode-cn.com/problems/arithmetic-slices-ii-subsequence/
+func numberOfArithmeticSlices(nums []int) int {
+	n, ans := len(nums), 0
+	dp := make([]map[int]int, n)
+	for i, v := range nums {
+		dp[i] = map[int]int{}
+		for j, x := range nums[:i] {
+			ans += dp[j][v-x]
+			dp[i][v-x] += dp[j][v-x] + 1
+		}
+	}
+	return ans
+}
+
+// https://leetcode-cn.com/problems/maximum-score-from-removing-substrings/
+func maximumGain(s string, x int, y int) int {
+	a, b, ca, cb, ans := 0, 0, 'a', 'b', 0
+	if x < y {
+		ca, cb, x, y = 'b', 'a', y, x
+	}
+	s += "x"
+	for _, v := range s {
+		if v == ca || v == cb {
+			if v == cb {
+				if a > 0 {
+					ans += x
+					a--
+				} else {
+					b++
+				}
+			}
+			if v == ca {
+				a++
+			}
+		} else {
+			ans += minTwo(a, b) * y
+			a, b = 0, 0
+		}
+	}
+	return ans
+}
+
+// https://leetcode-cn.com/problems/longest-palindromic-subsequence/solution/
+func longestPalindromeSubseq(s string) int {
+	n, arr := len(s), []byte(s)
+	dp := make([][]int, n+1)
+	for i := 0; i <= n; i++ {
+		dp[i] = make([]int, n+1-i)
+	}
+	for i := 0; i < n; i++ {
+		dp[1][i] = 1
+	}
+	for i := 2; i <= n; i++ {
+		for j := 0; j <= n-i; j++ {
+			if arr[j] == arr[j+i-1] {
+				dp[i][j] = dp[i-2][j+1] + 2
+			} else {
+				dp[i][j] = max(dp[i-1][j], dp[i-1][j+1])
+			}
+		}
+	}
+	return dp[n][0]
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+func countArrangement(n int) int {
+	f := map[int]int{0: 1}
+	for mask := 1; mask < 1<<n; mask++ {
+		k := oc(mask)
+		for i := 0; i < n; i++ {
+			if (mask & (1 << i)) > 0 { // 第i位是1
+				pre := mask ^ 1<<i                // 第i位设为0
+				if (i+1)%k == 0 || k%(i+1) == 0 { // 第k个数整除
+					f[mask] += f[pre]
+				}
+			}
+		}
+	}
+	return f[(1<<n)-1]
+}
+
+func oc(x int) (ans int) {
+	for x > 0 {
+		x -= x & -x
+		ans++
+	}
+	return
+}
+
+func rearrangeArray(nums []int) []int {
+	sort.Ints(nums)
+	ans := []int{}
+	for i := 0; i < len(nums)/2; i++ {
+		ans = append(ans, nums[i], nums[len(nums)-1-i])
+	}
+	if len(nums)%2 == 1 {
+		ans = append(ans, nums[len(nums)/2])
+	}
+	return ans
+}
+
+func wiggleSort(nums []int) {
+	sort.Ints(nums)
+	ans := []int{}
+	for i := 0; i < len(nums)/2; i++ {
+		ans = append(ans, nums[(len(nums)-1)/2-i], nums[len(nums)-1-i])
+	}
+	if len(nums)%2 == 1 {
+		ans = append(ans, nums[0])
+	}
+	for i, v := range ans {
+		nums[i] = v
+	}
+}
+
+// https://leetcode-cn.com/problems/student-attendance-record-ii/
+func checkRecord(n int) int {
+	mod := int(1e9) + 7
+	dp := make([][][]int, n+1)
+	for i := 0; i <= n; i++ {
+		dp[i] = make([][]int, 3) // 0-P 1-L 2-A
+		for j := 0; j <= 2; j++ {
+			dp[i][j] = make([]int, 2)
+		}
+	}
+
+	dp[0][0][0] = 1
+	dp[1][0][0] = 1
+	dp[1][1][0] = 1
+	dp[1][2][1] = 1
+
+	for i := 2; i <= n; i++ {
+		// P
+		dp[i][0][0] = (dp[i-1][0][0] + dp[i-1][1][0]) % mod
+		dp[i][0][1] = (dp[i-1][0][1] + dp[i-1][1][1] + dp[i-1][2][1]) % mod
+
+		// L
+		dp[i][1][0] = (dp[i-1][0][0] + dp[i-2][0][0]) % mod
+		dp[i][1][1] = (dp[i-1][2][1] + dp[i-1][0][1] + dp[i-2][0][1] + dp[i-2][2][1]) % mod
+
+		// A
+		dp[i][2][1] = (dp[i-1][0][0] + dp[i-1][1][0]) % mod
+	}
+
+	ans := 0
+	for _, arr := range dp[n] {
+		for _, v := range arr {
+			ans += v
+		}
+	}
+	return ans
 }
