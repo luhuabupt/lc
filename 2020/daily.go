@@ -12,7 +12,7 @@ type TreeNode struct {
 }
 
 func main() {
-	fmt.Println(countArrangement(15))
+	fmt.Println(reverseStr("abcd", 4))
 }
 
 // 863 二叉树中所有距离为 K 的结点
@@ -530,6 +530,25 @@ func reverseVowels(s string) string {
 		arr[i], arr[j] = arr[j], arr[i]
 		i++
 		j--
+	}
+	return string(arr)
+}
+
+func reverseStr(s string, k int) string {
+	arr, reverse := []byte(s), false
+	for i := 0; i < len(s); i += k {
+		reverse = !reverse
+		if !reverse {
+			continue
+		}
+		for j := 0; j%k != k/2 && j%k != (len(s)-i)/2 && i+j < len(s); j++ {
+			r := i + k - 1 - j
+			if i+k >= len(s) {
+				r = len(s) - 1 - j
+			}
+			//fmt.Println(i+j, r)
+			arr[i+j], arr[r] = arr[r], arr[i+j]
+		}
 	}
 	return string(arr)
 }
