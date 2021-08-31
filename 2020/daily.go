@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"math/rand"
 	"sort"
-	"time"
 )
 
 type TreeNode struct {
@@ -571,7 +570,7 @@ type Solution struct {
 	sum []int
 }
 
-func Constructor(w []int) Solution {
+func Constructor_(w []int) Solution {
 	for i := 1; i < len(w); i++ {
 		w[i] += w[i-1]
 	}
@@ -593,4 +592,23 @@ func corpFlightBookings(bookings [][]int, n int) []int {
 		dp[i] += dp[i-1]
 	}
 	return dp[:n]
+}
+
+func distinctSubseqII(s string) int {
+	n := len(s)
+	dp, last := make([]int, n+1), map[uint8]int{}
+	dp[0] = 1
+	for k := 1; k <= n; k++ {
+		dp[k] = 2 * dp[k-1]
+		if last[s[k-1]] > 0 {
+			dp[k] -= dp[last[s[k-1]]-1]
+		}
+		dp[k] %= int(1e9 + 7)
+		last[s[k-1]] = k
+	}
+	ans := dp[n] - 1
+	if ans < 0 {
+		ans += int(1e9 + 7)
+	}
+	return ans
 }

@@ -1,4 +1,4 @@
-package main
+package classic
 
 type LRUCache struct {
 	c, l       int

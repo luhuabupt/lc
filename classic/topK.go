@@ -1,4 +1,4 @@
-package main
+package classic
 
 import "container/heap"
 
