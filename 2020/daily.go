@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"sort"
+	"time"
 )
 
 type TreeNode struct {
@@ -551,4 +553,44 @@ func reverseStr(s string, k int) string {
 		}
 	}
 	return string(arr)
+}
+
+func numRescueBoats(people []int, limit int) int {
+	sort.Ints(people)
+	ans := 0
+	for i, j := 0, len(people)-1; i <= j; j-- {
+		if people[i]+people[j] <= limit {
+			i++
+		}
+		ans++
+	}
+	return ans
+}
+
+type Solution struct {
+	sum []int
+}
+
+func Constructor(w []int) Solution {
+	for i := 1; i < len(w); i++ {
+		w[i] += w[i-1]
+	}
+	return Solution{w}
+}
+
+func (this *Solution) PickIndex() int {
+	r := rand.Intn(this.sum[len(this.sum)-1]) + 1
+	return sort.SearchInts(this.sum, r)
+}
+
+func corpFlightBookings(bookings [][]int, n int) []int {
+	dp := make([]int, n+1)
+	for _, arr := range bookings {
+		dp[arr[0]-1] += arr[2]
+		dp[arr[1]] -= arr[2]
+	}
+	for i := 1; i < n; i++ {
+		dp[i] += dp[i-1]
+	}
+	return dp[:n]
 }

@@ -19,17 +19,34 @@ func (h *hp) Push(v interface{}) { *h = append(*h, v.(pair)) }
 func (h *hp) Pop() interface{}   { a := *h; v := a[len(a)-1]; *h = a[:len(a)-1]; return v }
 
 func main() {
-
+	testVar()
 }
 
 func testVar() {
 	a := []int{0, 1, 2, 3}
-	for len(a) > 0 {
-		var t int
-		t, a = a[0], a[1:]
-		t, a := a[0], a[1:]
+	//for i := 0; i < 10; i++ {
+	//	a = append(a, i)
+	//}
+	fmt.Printf("%p", &a)
+	fmt.Println()
+	//fmt.Printf("%p", &a[0])
+	//fmt.Println()
+	//fmt.Printf("%p", &a[1])
+	//fmt.Println()
+	i := 2
+	for i > 0 {
+		//var t int
+		//t, a = a[0], a[1:]
+		t := a[0]
+		a = a[1:]
+		fmt.Printf("%p", &a[0])
+		fmt.Println()
 		fmt.Println(t, a)
+		i--
 	}
+	fmt.Printf("%p", &a)
+	fmt.Println()
+	fmt.Println(a)
 }
 
 func topKFrequent(words []string, k int) []string {
@@ -75,4 +92,5 @@ func minStoneSum(piles []int, k int) int {
 	for i := len(piles) - 1; i >= 0; i++ {
 
 	}
+	return 1
 }
