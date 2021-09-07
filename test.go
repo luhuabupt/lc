@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"container/heap"
+	"encoding/json"
 	"fmt"
 	"sort"
 )
@@ -19,7 +21,20 @@ func (h *hp) Push(v interface{}) { *h = append(*h, v.(pair)) }
 func (h *hp) Pop() interface{}   { a := *h; v := a[len(a)-1]; *h = a[:len(a)-1]; return v }
 
 func main() {
-	testVar()
+	testJson()
+}
+
+type Resp struct {
+	a int `json:"a"`
+}
+
+func testJson() {
+	var test interface{}
+	content := []byte(`{"a":10000000000000000}`)
+	d := json.NewDecoder(bytes.NewReader(content))
+	d.UseNumber()
+	err := d.Decode(&test)
+	fmt.Println(err)
 }
 
 func testVar() {

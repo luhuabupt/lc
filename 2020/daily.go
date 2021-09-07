@@ -612,3 +612,157 @@ func distinctSubseqII(s string) int {
 	}
 	return ans
 }
+
+type ListNode struct {
+	Val  int
+	Next *ListNode
+}
+
+func getKthFromEnd(head *ListNode, k int) *ListNode {
+	a, b := head, head
+	for i := 0; i < k; i++ {
+		b = b.Next
+	}
+	for b != nil {
+		a, b = a.Next, b.Next
+	}
+	return a
+}
+
+// 1d bin packing 背包不可解
+func minSessions_(tasks []int, sessionTime int) (ans int) {
+	sort.Ints(tasks)
+	ans = get(tasks, sessionTime)
+	for i := 0; i < len(tasks)/2; i++ {
+		tasks[i], tasks[len(tasks)-1-i] = tasks[len(tasks)-1-i], tasks[i]
+	}
+	x := get(tasks, sessionTime)
+	if x < ans {
+		ans = x
+	}
+	return
+}
+
+func get(tasks []int, sessionTime int) (ans int) {
+	mt := map[int]bool{0: true}
+	for len(mt) > 0 {
+		ans++
+		mt = map[int]bool{}
+		for k, _ := range tasks {
+			mt[k] = true
+		}
+
+		// 背包
+		dp, path := map[int]int{}, make([][]int, len(tasks))
+		for k, v := range tasks {
+			tmpI := k
+			dp[k] = v
+			path[k] = []int{}
+			for i := 0; i < k; i++ {
+				if dp[i]+v <= sessionTime && dp[k] < dp[i]+v {
+					dp[k] = dp[i] + v
+					tmpI = i
+				}
+			}
+			path[k] = append(path[tmpI], k)
+		}
+
+		// 找出最多方案
+		mv, mk := 0, 0
+		for i := 0; i < len(tasks); i++ {
+			if dp[i] > mv {
+				mk, mv = i, dp[i]
+			}
+		}
+
+		// 删除已装
+		for _, v := range path[mk] {
+			delete(mt, v)
+		}
+
+		// 重置tasks
+		nt := []int{}
+		for t, tv := range tasks {
+			if mt[t] {
+				nt = append(nt, tv)
+			}
+		}
+		tasks = nt
+	}
+	return
+}
+
+func minSessions(tasks []int, sessionTime int) (ans int) {
+
+	return
+}
+
+func numberOfUniqueGoodSubsequences(binary string) int {
+	pre, dp, i, zero, mod := [2]int{-1, -1}, make([]int, len(binary)), 0, 0, int(1e9+7)
+	for binary[i] != 49 {
+		i++
+		if i == len(binary) {
+			return 1
+		}
+	}
+
+	if i > 0 {
+		zero = 1
+	}
+	dp[i], i = 1, i+1
+	for i < len(binary) {
+		v := binary[i] - 48
+		if v == 0 {
+			zero = 1
+		}
+		dp[i] = dp[i-1] * 2
+		if pre[v] >= 0 {
+			dp[i] -= dp[pre[v]-1]
+		}
+		if dp[i] < 0 {
+			dp[i] += mod
+		} else {
+			dp[i] %= mod
+		}
+		pre[v] = i
+		i++
+	}
+	return dp[len(binary)-1] + zero
+}
+
+func minimumOperations(leaves string) int {
+	ans := 0
+	if leaves[0] != 'r' {
+		ans++
+	}
+	if leaves[len(leaves)-1] != 'r' {
+		ans++
+	}
+
+	sr, sy := make([]int, len(leaves)), make([]int, len(leaves))
+	sr[0], sy[0] = 1, 0
+	for i := 1; i < len(leaves)-1; i++ {
+		sr[i], sy[i] = sr[i-1], sy[i-1]
+		if leaves[i] == 'r' {
+			sr[i]++
+		} else {
+			sy[i]++
+		}
+	}
+	return ans
+}
+
+func search(nums []int, target int) int {
+	l, r := 0, len(nums)-1
+	for l <= r {
+		mid := (l + r) / 2
+		if nums[mid] == target {
+			return mid
+		} else if nums[mid] > target {
+			r = mid - 1
+		} else {
+			l = mid + 1
+		}
+	}
+	return -1
+}
