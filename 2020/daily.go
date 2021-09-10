@@ -766,3 +766,18 @@ func search(nums []int, target int) int {
 	}
 	return -1
 }
+
+func chalkReplacer(chalk []int, k int) int {
+	sum := 0
+	for _, v := range chalk {
+		sum += v
+	}
+	k = k % sum
+	for i, v := range chalk {
+		k -= v
+		if k < 0 {
+			return i
+		}
+	}
+	return 0
+}
