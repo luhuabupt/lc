@@ -781,3 +781,118 @@ func chalkReplacer(chalk []int, k int) int {
 	}
 	return 0
 }
+
+func numberOfBoomerangs(points [][]int) int {
+	n := len(points)
+	ans := 0
+	for _, cur := range points {
+		m := map[int]int{}
+		for j := 0; j < n; j++ {
+			d := (points[j][1]-cur[1])*(points[j][1]-cur[1]) + (points[j][0]-cur[0])*(points[j][0]-cur[0])
+			m[d]++
+		}
+		for _, v := range m {
+			ans += v * (v - 1)
+		}
+	}
+	return ans
+}
+
+func smallestMissingValueSubtree(parents []int, nums []int) []int {
+	son, ans := map[int][]int{}, make([]int, len(parents))
+	for i, v := range parents {
+		if son[v] == nil {
+			son[v] = []int{i}
+			continue
+		}
+		son[v] = append(son[v], i)
+	}
+
+	var f func(i int) map[int]bool
+	f = func(i int) map[int]bool {
+		inSet, val := map[int]bool{}, 1
+		for _, v := range son[i] {
+			w := f(v)
+			if len(w) > len(inSet) {
+				w, inSet = inSet, w
+			}
+			if ans[v] > val {
+				val = ans[v]
+			}
+			for x, _ := range w {
+				inSet[x] = true
+			}
+		}
+		inSet[nums[i]] = true
+
+		for inSet[val] == true {
+			val++
+		}
+		ans[i] = val
+
+		return inSet
+	}
+
+	f(0)
+	return ans
+}
+
+func findPeakElement(nums []int) int {
+	i, j := 0, len(nums)-1
+	for i < j {
+		if nums[i] > nums[j] {
+			j = (i + j) / 2
+		} else {
+			i = (i + j) / 2
+		}
+	}
+
+}
+
+func isValidSudoku(board [][]byte) bool {
+	for i := 0; i < 9; i++ {
+		m := map[byte]bool{}
+		for _, v := range board[i] {
+			if v == '.' {
+				continue
+			}
+			if m[v] {
+				return false
+			}
+			m[v] = true
+		}
+	}
+	for i := 0; i < 9; i++ {
+		m := map[byte]bool{}
+		for j := 0; j < 9; j++ {
+			if board[j][i] == '.' {
+				continue
+			}
+			if m[board[j][i]] {
+				return false
+			}
+			m[board[j][i]] = true
+		}
+	}
+	i, j := 0, 0
+	for k := 0; k < 9; k++ {
+		m := map[byte]bool{}
+		for x := 0; x < 3; x++ {
+			for y := 0; y < 3; y++ {
+				cur := board[i+x][j+y]
+				if cur == '.' {
+					continue
+				}
+				if m[cur] {
+					return false
+				}
+				m[cur] = true
+			}
+		}
+		j += 3
+		if j == 9 {
+			i, j = i+3, 0
+		}
+	}
+	return true
+}
