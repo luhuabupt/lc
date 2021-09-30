@@ -896,3 +896,42 @@ func isValidSudoku(board [][]byte) bool {
 	}
 	return true
 }
+
+func splitListToParts(head *ListNode, k int) []*ListNode {
+	ans, n := make([]*ListNode, k), 0
+	for x := head; x != nil; x = x.Next {
+		n++
+	}
+
+	for j, p, l := 0, head, n/k+1; j < k && p != nil; j++ {
+		ans[j] = p
+		if n%k == j {
+			l--
+		}
+		for i := 1; i < l && p != nil; i++ {
+			p = p.Next
+		}
+		p, p.Next = p.Next, nil
+	}
+
+	return ans
+}
+
+func computeArea(ax1 int, ay1 int, ax2 int, ay2 int, bx1 int, by1 int, bx2 int, by2 int) int {
+	sum := (ax2-ax1)*(ay2-ay1) + (bx2-bx1)*(by2-by1)
+	return sum - sec(ax1, ax2, bx1, bx2)*sec(ay1, ay2, by1, by2)
+}
+
+// 两线段交集长度
+func sec(a1, b1, a2, b2 int) int {
+	if a1 > a2 {
+		return sec(a2, b2, a1, b1)
+	}
+	if a2 > b1 {
+		return 0
+	}
+	if b2 < b1 {
+		return b2 - a2
+	}
+	return b1 - a2
+}
