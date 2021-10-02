@@ -1,8 +1,7 @@
 package main
 
 import (
-	"container/heap"
-	"fmt"
+	"math/rand"
 	"sort"
 )
 
@@ -13,8 +12,6 @@ type TreeNode struct {
 }
 
 func main() {
-	//fmt.Println(countArrangement(15))
-	fmt.Println(checkValidString("(((((*(()((((*((**(((()()*)()()()*((((**)())*)*)))))))(())(()))())((*()()(((()((()*(())*(()**)()(())"))
 }
 
 // 863 二叉树中所有距离为 K 的结点
@@ -561,6 +558,37 @@ func interchangeableRectangles(rectangles [][]int) int64 {
 	return ans
 }
 
+func reverseStr(s string, k int) string {
+	arr, reverse := []byte(s), false
+	for i := 0; i < len(s); i += k {
+		reverse = !reverse
+		if !reverse {
+			continue
+		}
+		for j := 0; j%k != k/2 && j%k != (len(s)-i)/2 && i+j < len(s); j++ {
+			r := i + k - 1 - j
+			if i+k >= len(s) {
+				r = len(s) - 1 - j
+			}
+			//fmt.Println(i+j, r)
+			arr[i+j], arr[r] = arr[r], arr[i+j]
+		}
+	}
+	return string(arr)
+}
+
+func numRescueBoats(people []int, limit int) int {
+	sort.Ints(people)
+	ans := 0
+	for i, j := 0, len(people)-1; i <= j; j-- {
+		if people[i]+people[j] <= limit {
+			i++
+		}
+		ans++
+	}
+	return ans
+}
+
 func checkValidString(s string) bool {
 	l, star, cl := 0, 0, 0
 	for _, v := range s {
@@ -599,21 +627,42 @@ func getTwo(a, b int) int {
 	return b
 }
 
-func topKFrequent(words []string, k int) []string {
-	cnt := map[string]int{}
-	for _, w := range words {
-		cnt[w]++
+type Solution struct {
+	sum []int
+}
+
+func (this *Solution) PickIndex() int {
+	r := rand.Intn(this.sum[len(this.sum)-1]) + 1
+	return sort.SearchInts(this.sum, r)
+}
+
+func corpFlightBookings(bookings [][]int, n int) []int {
+	dp := make([]int, n+1)
+	for _, arr := range bookings {
+		dp[arr[0]-1] += arr[2]
+		dp[arr[1]] -= arr[2]
 	}
-	h := &hp{}
-	for w, c := range cnt {
-		heap.Push(h, pair{w, c})
-		if h.Len() > k {
-			heap.Pop(h)
+	for i := 1; i < n; i++ {
+		dp[i] += dp[i-1]
+	}
+	return dp[:n]
+}
+
+func distinctSubseqII(s string) int {
+	n := len(s)
+	dp, last := make([]int, n+1), map[uint8]int{}
+	dp[0] = 1
+	for k := 1; k <= n; k++ {
+		dp[k] = 2 * dp[k-1]
+		if last[s[k-1]] > 0 {
+			dp[k] -= dp[last[s[k-1]]-1]
 		}
+		dp[k] %= int(1e9 + 7)
+		last[s[k-1]] = k
 	}
-	ans := make([]string, k)
-	for i := k - 1; i >= 0; i-- {
-		ans[i] = heap.Pop(h).(pair).w
+	ans := dp[n] - 1
+	if ans < 0 {
+		ans += int(1e9 + 7)
 	}
 	return ans
 }
@@ -744,61 +793,174 @@ func twoMax(a, b int) int {
 	return b
 }
 
-func smallestMissingValueSubtree(parents []int, nums []int) []int {
-	n := len(parents)
-	son := make([][]int, n)
-	ans := make([]int, n)
 
-	for i := 1; i < n; i++ {
-		son[parents[i]] = append(son[parents[i]], i)
+type ListNode struct {
+	Val  int
+	Next *ListNode
+}
+
+func getKthFromEnd(head *ListNode, k int) *ListNode {
+	a, b := head, head
+	for i := 0; i < k; i++ {
+		b = b.Next
+	}
+	for b != nil {
+		a, b = a.Next, b.Next
+	}
+	return a
+}
+
+func minimumOperations(leaves string) int {
+	ans := 0
+	if leaves[0] != 'r' {
+		ans++
+	}
+	if leaves[len(leaves)-1] != 'r' {
+		ans++
 	}
 
-	var f func(i int) map[int]bool
-	f = func(i int) map[int]bool {
-		inSet := map[int]bool{}
-		for _, v := range son[i] {
-			sm := f(v)
-			if len(sm) > len(inSet) {
-				sm, inSet = inSet, sm
-			}
+	sr, sy := make([]int, len(leaves)), make([]int, len(leaves))
+	sr[0], sy[0] = 1, 0
+	for i := 1; i < len(leaves)-1; i++ {
+		sr[i], sy[i] = sr[i-1], sy[i-1]
+		if leaves[i] == 'r' {
+			sr[i]++
+		} else {
+			sy[i]++
 		}
 	}
-	f(0)
+	return ans
+}
+
+func search(nums []int, target int) int {
+	l, r := 0, len(nums)-1
+	for l <= r {
+		mid := (l + r) / 2
+		if nums[mid] == target {
+			return mid
+		} else if nums[mid] > target {
+			r = mid - 1
+		} else {
+			l = mid + 1
+		}
+	}
+	return -1
+}
+
+func chalkReplacer(chalk []int, k int) int {
+	sum := 0
+	for _, v := range chalk {
+		sum += v
+	}
+	k = k % sum
+	for i, v := range chalk {
+		k -= v
+		if k < 0 {
+			return i
+		}
+	}
+	return 0
+}
+
+func numberOfBoomerangs(points [][]int) int {
+	n := len(points)
+	ans := 0
+	for _, cur := range points {
+		m := map[int]int{}
+		for j := 0; j < n; j++ {
+			d := (points[j][1]-cur[1])*(points[j][1]-cur[1]) + (points[j][0]-cur[0])*(points[j][0]-cur[0])
+			m[d]++
+		}
+		for _, v := range m {
+			ans += v * (v - 1)
+		}
+	}
+	return ans
+}
+
+func isValidSudoku(board [][]byte) bool {
+	for i := 0; i < 9; i++ {
+		m := map[byte]bool{}
+		for _, v := range board[i] {
+			if v == '.' {
+				continue
+			}
+			if m[v] {
+				return false
+			}
+			m[v] = true
+		}
+	}
+	for i := 0; i < 9; i++ {
+		m := map[byte]bool{}
+		for j := 0; j < 9; j++ {
+			if board[j][i] == '.' {
+				continue
+			}
+			if m[board[j][i]] {
+				return false
+			}
+			m[board[j][i]] = true
+		}
+	}
+	i, j := 0, 0
+	for k := 0; k < 9; k++ {
+		m := map[byte]bool{}
+		for x := 0; x < 3; x++ {
+			for y := 0; y < 3; y++ {
+				cur := board[i+x][j+y]
+				if cur == '.' {
+					continue
+				}
+				if m[cur] {
+					return false
+				}
+				m[cur] = true
+			}
+		}
+		j += 3
+		if j == 9 {
+			i, j = i+3, 0
+		}
+	}
+	return true
+}
+
+func splitListToParts(head *ListNode, k int) []*ListNode {
+	ans, n := make([]*ListNode, k), 0
+	for x := head; x != nil; x = x.Next {
+		n++
+	}
+
+	for j, p, l := 0, head, n/k+1; j < k && p != nil; j++ {
+		ans[j] = p
+		if n%k == j {
+			l--
+		}
+		for i := 1; i < l && p != nil; i++ {
+			p = p.Next
+		}
+		p, p.Next = p.Next, nil
+	}
 
 	return ans
 }
-func tm(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
+
+func computeArea(ax1 int, ay1 int, ax2 int, ay2 int, bx1 int, by1 int, bx2 int, by2 int) int {
+	sum := (ax2-ax1)*(ay2-ay1) + (bx2-bx1)*(by2-by1)
+	return sum - sec(ax1, ax2, bx1, bx2)*sec(ay1, ay2, by1, by2)
 }
 
-func findLongestWord(s string, dictionary []string) string {
-	n := len(s)
-	m := make([][26]int, n+1)
-	for x := 'a'; x <= 'z'; x++ {
-		m[n][x-'a'] = -1
+// 两线段交集长度
+func sec(a1, b1, a2, b2 int) int {
+	if a1 > a2 {
+		return sec(a2, b2, a1, b1)
 	}
-	for i := n - 1; i >= 0; i-- {
-		m[i] = m[i+1]
-		m[i][s[i]-'a'] = i
+	if a2 > b1 {
+		return 0
 	}
-
-	sort.Slice(dictionary, func(i, j int) bool {
-		return len(dictionary[i]) > len(dictionary[j]) || len(dictionary[i]) == len(dictionary[j]) && dictionary[i] < dictionary[j]
-	})
-
-outer:
-	for i := 0; i < len(dictionary); i++ {
-		j := 0
-		for _, v := range dictionary[i] {
-			if m[j][v-'a'] == -1 {
-				continue outer
-			}
-			j = m[j][v-'a'] + 1
-		}
-		return dictionary[i]
+	if b2 < b1 {
+		return b2 - a2
 	}
-	return ""
+	return b1 - a2
 }

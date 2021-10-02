@@ -1,14 +1,16 @@
 package lib
 
-// 快速幂
-func myPow(x float64, n int) float64 {
-	ans := 1.0
+func main() {
+	QuickPow(2, 5)
+}
+
+func QuickPow(a, n int) int {
+	ans := 1
 	for n > 0 {
-		if n%2 == 1 {
-			ans *= x
-			n--
+		if n&1 > 0 {
+			ans *= a
 		}
-		x *= x
+		a *= a
 		n /= 2
 	}
 	return ans
