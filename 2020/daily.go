@@ -1,6 +1,7 @@
 package main
 
 import (
+	"container/heap"
 	"fmt"
 	"math/rand"
 	"sort"
@@ -10,10 +11,6 @@ type TreeNode struct {
 	Val   int
 	Left  *TreeNode
 	Right *TreeNode
-}
-
-func main() {
-	fmt.Println(reverseStr("abcd", 4))
 }
 
 // 863 二叉树中所有距离为 K 的结点
@@ -837,18 +834,6 @@ func smallestMissingValueSubtree(parents []int, nums []int) []int {
 	return ans
 }
 
-func findPeakElement(nums []int) int {
-	i, j := 0, len(nums)-1
-	for i < j {
-		if nums[i] > nums[j] {
-			j = (i + j) / 2
-		} else {
-			i = (i + j) / 2
-		}
-	}
-
-}
-
 func isValidSudoku(board [][]byte) bool {
 	for i := 0; i < 9; i++ {
 		m := map[byte]bool{}
@@ -934,4 +919,175 @@ func sec(a1, b1, a2, b2 int) int {
 		return b2 - a2
 	}
 	return b1 - a2
+}
+
+type SummaryRanges struct {
+	m   map[int]bool
+	res [][]int
+}
+
+func Constructor__() SummaryRanges {
+	return SummaryRanges{
+		m:   map[int]bool{},
+		res: [][]int{},
+	}
+}
+
+func (this *SummaryRanges) AddNum(val int) { // [0,1E4]
+	if this.m[val] == true {
+		return
+	}
+	this.m[val] = true
+
+	if this.m[val+1] == false && this.m[val-1] == false {
+		// 二分插入
+		pos := binaryRight(this.res, val)
+		if pos == len(this.res) {
+			this.res = append(this.res, []int{val, val})
+		} else {
+			x := append([][]int{}, this.res[pos:]...)
+			this.res = append(append(this.res[:pos], []int{val, val}), x...)
+		}
+	} else if this.m[val+1] == true && this.m[val-1] == false {
+		// 合到右边
+		pos := binaryRight(this.res, val)
+		this.res[pos][0] = val
+	} else if this.m[val+1] == false && this.m[val-1] == true {
+		// 合到左边
+		pos := binaryRight(this.res, val)
+		this.res[pos-1][1] = val
+	} else {
+		// 合并左右
+		pos := binaryRight(this.res, val)
+		this.res[pos-1][1] = this.res[pos][1]
+		if pos == len(this.res)-1 {
+			this.res = this.res[:len(this.res)-1]
+		} else {
+			this.res = append(this.res[:pos], this.res[pos+1:]...)
+		}
+	}
+}
+
+func binaryRight(arr [][]int, v int) int {
+	l, r, pos := 0, len(arr)-1, 0
+	for l <= r {
+		mid := (l + r) / 2
+		if v < arr[mid][1] {
+			pos, r = mid, mid-1
+		} else {
+			pos, l = mid+1, mid+1
+		}
+	}
+	return pos
+}
+
+func (this *SummaryRanges) GetIntervals() [][]int {
+	return this.res
+}
+
+func main() {
+	method := []string{"StockPrice", "update", "update", "current", "maximum", "update", "maximum", "update", "minimum"}
+	data := [][]int{[]int{}, []int{1, 10}, []int{2, 5}, []int{}, []int{}, []int{1, 3}, []int{}, []int{4, 2}, []int{}}
+
+	obj := Constructor()
+	for k, v := range method {
+		if v == "StockPrice" {
+			continue
+		}
+		if v == "update" {
+			obj.Update(data[k][0], data[k][1])
+			fmt.Println(data[k][0], data[k][1], obj.bigH)
+		}
+		if v == "maximum" {
+			fmt.Println("max: ", obj.Maximum())
+		}
+		if v == "minimum" {
+			fmt.Println("min: ", obj.Minimum())
+		}
+	}
+}
+
+type Hi []int
+
+func (h Hi) Len() int            { return len(h) }
+func (h Hi) Less(i, j int) bool  { return h[i] > h[j] }
+func (h Hi) Swap(i, j int)       { h[i], h[j] = h[j], h[i] }
+func (h *Hi) Push(v interface{}) { *h = append(*h, v.(int)) }
+func (h *Hi) Pop() interface{} {
+	a := *h
+	v := a[len(a)-1]
+	*h = a[:len(a)-1]
+	return v
+}
+
+type Hi2 []int
+
+func (h Hi2) Len() int            { return len(h) }
+func (h Hi2) Less(i, j int) bool  { return h[i] < h[j] }
+func (h Hi2) Swap(i, j int)       { h[i], h[j] = h[j], h[i] }
+func (h *Hi2) Push(v interface{}) { *h = append(*h, v.(int)) }
+func (h *Hi2) Pop() interface{} {
+	a := *h
+	v := a[len(a)-1]
+	*h = a[:len(a)-1]
+	return v
+}
+
+type StockPrice struct {
+	timePrice map[int]int
+	bigH      *Hi
+	smallH    *Hi2
+	priceMap  map[int]int
+	mxTs      int
+}
+
+func Constructor() StockPrice {
+	return StockPrice{
+		timePrice: map[int]int{},
+		bigH:      &Hi{},
+		smallH:    &Hi2{},
+		priceMap:  map[int]int{},
+		mxTs:      0,
+	}
+}
+
+func (this *StockPrice) Update(timestamp int, price int) {
+	if this.timePrice[timestamp] > 0 {
+		this.priceMap[this.timePrice[timestamp]]--
+	}
+
+	this.timePrice[timestamp] = price
+	this.priceMap[price]++
+
+	if timestamp > this.mxTs {
+		this.mxTs = timestamp
+	}
+	heap.Push(this.bigH, price)
+	heap.Push(this.smallH, price)
+}
+
+func (this *StockPrice) Current() int {
+	return this.timePrice[this.mxTs]
+}
+
+func (this *StockPrice) Maximum() int {
+	h := this.bigH
+	for {
+		x := heap.Pop(h).(int)
+		if this.priceMap[x] > 0 {
+			heap.Push(this.bigH, x)
+			return x
+		}
+	}
+}
+
+func (this *StockPrice) Minimum() int {
+	h := this.smallH
+	for {
+		x := heap.Pop(h).(int)
+		if this.priceMap[x] > 0 {
+			heap.Push(this.smallH, x)
+			return x
+		}
+	}
 }
