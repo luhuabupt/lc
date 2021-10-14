@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"sort"
+	"strconv"
 )
 
 func compress(chars []byte) int {
@@ -659,4 +660,135 @@ func toHex(num int) string {
 	}
 
 	return ans
+}
+
+func fractionToDecimal(numerator int, denominator int) string {
+	if numerator < 0 && denominator < 0 {
+		numerator, denominator = -numerator, -denominator
+	}
+	if numerator < 0 {
+		return "-" + fractionToDecimal(-numerator, denominator)
+	}
+	if denominator < 0 {
+		return "-" + fractionToDecimal(numerator, -denominator)
+	}
+	if numerator%denominator == 0 {
+		return strconv.Itoa(numerator / denominator)
+	}
+
+	ans := []byte{}
+	if numerator/denominator > 0 {
+		ans = []byte(strconv.Itoa(numerator / denominator))
+	} else {
+		ans = []byte{'0'}
+	}
+	ans = append(ans, '.')
+
+	m := map[int]int{}
+	numerator %= denominator
+	i, s := len(ans), len(ans)
+	for {
+
+		if m[numerator] > 0 {
+			s = m[numerator]
+			ans = append(ans, ')')
+			break
+		}
+		m[numerator] = i
+
+		numerator *= 10
+		for numerator < denominator {
+			numerator *= 10
+			ans = append(ans, '0')
+		}
+
+		ans = append(ans, uint8(numerator/denominator+'0'))
+		i = len(ans)
+		numerator = numerator % denominator
+		if numerator == 0 {
+			return string(ans)
+		}
+	}
+
+	return string(ans[:s]) + "(" + string(ans[s:])
+}
+
+func removeKdigits(num string, k int) string {
+	stack := []byte{num[0]}
+	for i := 1; i < len(num); i++ {
+		for ; k > 0 && len(stack) > 0 && num[i] < stack[len(stack)-1]; k-- {
+			stack = stack[:len(stack)-1]
+		}
+		stack = append(stack, num[i])
+	}
+	stack = stack[:len(stack)-k]
+
+	i := 0
+	for i < len(stack) && stack[i] == '0' {
+		i++
+	}
+
+	ans := string(stack[i:])
+	if len(ans) == 0 {
+		ans = "0"
+	}
+
+	return ans
+}
+
+func removeDuplicateLetters(s string) string {
+	cnt := map[int32]int{}
+	for _, v := range s {
+		cnt[v]++
+	}
+
+	m := map[int32]bool{}
+	ans := []int32{}
+	for _, v := range s {
+		cnt[v]--
+		for len(ans) > 0 && ans[len(ans)-1] > v && cnt[ans[len(ans)-1]] > 0 {
+			m[ans[len(ans)-1]] = false
+			ans = ans[:len(ans)-1]
+		}
+		if m[v] {
+			continue
+		}
+		ans = append(ans, v)
+		m[v] = true
+	}
+
+	return string(ans)
+}
+
+func peakIndexInMountainArray(arr []int) int {
+	return sort.Search(len(arr)-1, func(i int) bool { return arr[i] > arr[i+1] })
+}
+
+func countAndSay(n int) string {
+	a := []string{"", "1"}
+	for i := 2; i <= n; i++ {
+		x := a[i-1]
+		cur := []int32{}
+		tmp := 1
+		pre := ' '
+		for k, v := range x {
+			if k == 0 {
+				pre = v
+				continue
+			}
+			if v == pre {
+				tmp++
+			} else {
+				cur = append(cur, []int32(strconv.Itoa(tmp))...)
+				cur = append(cur, pre)
+				pre = v
+				tmp = 1
+			}
+		}
+		cur = append(cur, []int32(strconv.Itoa(tmp))...)
+		cur = append(cur, pre)
+		a = append(a, string(cur))
+	}
+
+	return a[n]
 }
