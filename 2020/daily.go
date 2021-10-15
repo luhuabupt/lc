@@ -532,6 +532,31 @@ func reverseVowels(s string) string {
 	return string(arr)
 }
 
+func reversePrefix(word string, ch byte) string {
+	w := []byte(word)
+	for i := 0; i < len(w); i++ {
+		if w[i] == ch {
+			for j := 0; j <= i/2; j++ {
+				w[j], w[i-j] = w[i-j], w[j]
+			}
+			break
+		}
+	}
+	return string(w)
+}
+
+func interchangeableRectangles(rectangles [][]int) int64 {
+	m := map[float64]int64{}
+	for _, v := range rectangles {
+		m[(float64(v[0])/float64(v[1]))]++
+	}
+	ans := int64(0)
+	for _, v := range m {
+		ans += v * (v - 1) / 2
+	}
+	return ans
+}
+
 func reverseStr(s string, k int) string {
 	arr, reverse := []byte(s), false
 	for i := 0; i < len(s); i += k {
@@ -563,15 +588,46 @@ func numRescueBoats(people []int, limit int) int {
 	return ans
 }
 
-type Solution struct {
-	sum []int
+func checkValidString(s string) bool {
+	l, star, cl := 0, 0, 0
+	for _, v := range s {
+		if v == '*' {
+			star++
+			cl++ // 可能的右
+		} else if v == '(' {
+			l++
+		} else if v == ')' {
+			if l > 0 {
+				l--
+			} else if star > 0 {
+				star--
+			} else {
+				return false
+			}
+		}
+		if cl > l { // 在L之前出现的删除
+			cl = l
+		}
+	}
+	return l <= cl
 }
 
-func Constructor_(w []int) Solution {
-	for i := 1; i < len(w); i++ {
-		w[i] += w[i-1]
+func getSeq(s []byte) {
+	for i := 1; i < 1<<len(s)-1; i++ {
+		for j := 1; j < len(s); j++ {
+
+		}
 	}
-	return Solution{w}
+}
+func getTwo(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+type Solution struct {
+	sum []int
 }
 
 func (this *Solution) PickIndex() int {
@@ -610,6 +666,133 @@ func distinctSubseqII(s string) int {
 	return ans
 }
 
+func isPrefixString(s string, words []string) bool {
+	idx := 0
+	for _, str := range words {
+		if idx+len(str) > len(s) {
+			return false
+		}
+		for i := 0; i < len(str); i++ {
+			if str[i] != s[idx] {
+				return false
+			}
+			idx++
+		}
+		if idx == len(s) {
+			return true
+		}
+	}
+	return idx == len(s)
+}
+
+func get(v int, z *[]int) int {
+	ans := 0
+	for v != 1 {
+		for i, x := range *z {
+			if v%x == 0 {
+				ans |= 1 << i
+				v /= x
+			}
+		}
+	}
+	return ans
+}
+
+func countSubstrings(s string) int {
+	dp, ans := map[int]map[int]bool{}, 0
+	for i := 1; i <= len(s); i++ {
+		dp[i] = map[int]bool{}
+	}
+	for k, _ := range s {
+		dp[1][k] = true
+		ans++
+	}
+	for i := 0; i <= len(s)-2; i++ {
+		if s[i] == s[i+1] {
+			dp[2][i] = true
+			ans++
+		}
+	}
+	for l := 3; l <= len(s); l++ {
+		for i := 0; i <= len(s)-l; i++ {
+			if dp[l-2][i+1] && s[i] == s[i+l-1] {
+				dp[l][i] = true
+				ans++
+			}
+		}
+	}
+	return ans
+}
+
+func maxProduct(s string) (max int) {
+	sa, n, max := []byte(s), len(s), 0
+	for i := 1; i < 1<<n-1; i++ {
+		cur, supp := []byte{}, []byte{}
+		for j := 0; j < n; j++ {
+			if i&(1<<j) > 0 {
+				cur = append(cur, sa[j])
+			} else {
+				supp = append(supp, sa[j]) // 补集
+			}
+		}
+		if check(cur) {
+			x := len(cur) * maxSeq(string(supp))
+			max = twoMax(x, max)
+		}
+	}
+	return
+}
+func check(s []byte) bool {
+	for i := 0; i < len(s)/2; i++ {
+		if s[i] != s[len(s)-1-i] {
+			return false
+		}
+	}
+	return true
+}
+func maxSeq(s string) int {
+	max := 1
+	for i := 1; i < 1<<len(s)-1; i++ {
+		tmp := []byte{}
+		for j := 1; j < len(s); j++ {
+			if i&(1<<j) > 0 {
+				tmp = append(tmp, s[j])
+			}
+		}
+		if check(tmp) {
+			max = twoMax(max, len(tmp))
+		}
+	}
+	return max
+}
+func maxSeq_(s string) int {
+	n, arr := len(s), []byte(s)
+	dp := make([][]int, n+1)
+	for i := 0; i <= n; i++ {
+		dp[i] = make([]int, n+1-i)
+	}
+	for i := 0; i < n; i++ {
+		dp[1][i] = 1
+	}
+	for i := 2; i <= n; i++ {
+		for j := 0; j <= n-i; j++ {
+			if arr[j] == arr[j+i-1] {
+				dp[i][j] = dp[i-2][j+1] + 2
+			} else {
+				dp[i][j] = twoMax(dp[i-1][j], dp[i-1][j+1])
+			}
+		}
+	}
+	return dp[n][0]
+}
+func twoMax(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+
 type ListNode struct {
 	Val  int
 	Next *ListNode
@@ -624,107 +807,6 @@ func getKthFromEnd(head *ListNode, k int) *ListNode {
 		a, b = a.Next, b.Next
 	}
 	return a
-}
-
-// 1d bin packing 背包不可解
-func minSessions_(tasks []int, sessionTime int) (ans int) {
-	sort.Ints(tasks)
-	ans = get(tasks, sessionTime)
-	for i := 0; i < len(tasks)/2; i++ {
-		tasks[i], tasks[len(tasks)-1-i] = tasks[len(tasks)-1-i], tasks[i]
-	}
-	x := get(tasks, sessionTime)
-	if x < ans {
-		ans = x
-	}
-	return
-}
-
-func get(tasks []int, sessionTime int) (ans int) {
-	mt := map[int]bool{0: true}
-	for len(mt) > 0 {
-		ans++
-		mt = map[int]bool{}
-		for k, _ := range tasks {
-			mt[k] = true
-		}
-
-		// 背包
-		dp, path := map[int]int{}, make([][]int, len(tasks))
-		for k, v := range tasks {
-			tmpI := k
-			dp[k] = v
-			path[k] = []int{}
-			for i := 0; i < k; i++ {
-				if dp[i]+v <= sessionTime && dp[k] < dp[i]+v {
-					dp[k] = dp[i] + v
-					tmpI = i
-				}
-			}
-			path[k] = append(path[tmpI], k)
-		}
-
-		// 找出最多方案
-		mv, mk := 0, 0
-		for i := 0; i < len(tasks); i++ {
-			if dp[i] > mv {
-				mk, mv = i, dp[i]
-			}
-		}
-
-		// 删除已装
-		for _, v := range path[mk] {
-			delete(mt, v)
-		}
-
-		// 重置tasks
-		nt := []int{}
-		for t, tv := range tasks {
-			if mt[t] {
-				nt = append(nt, tv)
-			}
-		}
-		tasks = nt
-	}
-	return
-}
-
-func minSessions(tasks []int, sessionTime int) (ans int) {
-
-	return
-}
-
-func numberOfUniqueGoodSubsequences(binary string) int {
-	pre, dp, i, zero, mod := [2]int{-1, -1}, make([]int, len(binary)), 0, 0, int(1e9+7)
-	for binary[i] != 49 {
-		i++
-		if i == len(binary) {
-			return 1
-		}
-	}
-
-	if i > 0 {
-		zero = 1
-	}
-	dp[i], i = 1, i+1
-	for i < len(binary) {
-		v := binary[i] - 48
-		if v == 0 {
-			zero = 1
-		}
-		dp[i] = dp[i-1] * 2
-		if pre[v] >= 0 {
-			dp[i] -= dp[pre[v]-1]
-		}
-		if dp[i] < 0 {
-			dp[i] += mod
-		} else {
-			dp[i] %= mod
-		}
-		pre[v] = i
-		i++
-	}
-	return dp[len(binary)-1] + zero
 }
 
 func minimumOperations(leaves string) int {
