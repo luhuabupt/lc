@@ -792,7 +792,6 @@ func twoMax(a, b int) int {
 	return b
 }
 
-
 type ListNode struct {
 	Val  int
 	Next *ListNode
@@ -1067,28 +1066,6 @@ func (this *SummaryRanges) GetIntervals() [][]int {
 	return this.res
 }
 
-func main() {
-	method := []string{"StockPrice", "update", "update", "current", "maximum", "update", "maximum", "update", "minimum"}
-	data := [][]int{[]int{}, []int{1, 10}, []int{2, 5}, []int{}, []int{}, []int{1, 3}, []int{}, []int{4, 2}, []int{}}
-
-	obj := Constructor()
-	for k, v := range method {
-		if v == "StockPrice" {
-			continue
-		}
-		if v == "update" {
-			obj.Update(data[k][0], data[k][1])
-			fmt.Println(data[k][0], data[k][1], obj.bigH)
-		}
-		if v == "maximum" {
-			fmt.Println("max: ", obj.Maximum())
-		}
-		if v == "minimum" {
-			fmt.Println("min: ", obj.Minimum())
-		}
-	}
-}
-
 type Hi []int
 
 func (h Hi) Len() int            { return len(h) }
@@ -1172,4 +1149,68 @@ func (this *StockPrice) Minimum() int {
 			return x
 		}
 	}
+}
+
+func main() {
+	fmt.Println(secondMinimum(11, [][]int{{9, 1}, {9, 2}, {2, 3}, {10, 3}, {7, 1}, {4, 3}, {6, 2}, {8, 9}, {5, 2}, {6, 11}, {9, 7}, {4, 2}, {4, 10}, {1, 10}, {2, 10}, {1, 4}, {5, 7}, {10, 8}, {5, 9}, {7, 3}, {7, 10}, {6, 5}}, 7, 2))
+}
+
+func secondMinimum(n int, edges [][]int, time int, change int) int {
+	sub := make([][]int, n+1)
+	dp := map[int]int{1: 0}
+	for _, e := range edges {
+		sub[e[0]] = append(sub[e[0]], e[1])
+		sub[e[1]] = append(sub[e[1]], e[0])
+	}
+
+	// 找到最短路
+	next := map[int]bool{}
+	cur := map[int]bool{1: true}
+	deep, flag := 0, true
+	for flag {
+		deep++
+		next = map[int]bool{}
+		for e, _ := range cur {
+			for _, v := range sub[e] {
+				if v == n {
+					flag = false
+				}
+				if dp[v] == 0 {
+					dp[v] = deep
+				}
+				if deep == dp[v] || deep == dp[v]+1 {
+					next[v] = true
+				}
+			}
+		}
+		cur = next
+	}
+
+	// 再执行一步
+	flag = false
+	for e, _ := range cur {
+		if flag {
+			break
+		}
+		for _, v := range sub[e] {
+			if v == n {
+				deep++
+				flag = true
+				break
+			}
+		}
+	}
+	if !flag {
+		deep += 2
+	}
+
+	ans := 0
+	for i := 1; i <= deep-1; i++ {
+		ans += time
+		if (ans/change)%2 == 1 {
+			ans += change - ans%change
+		}
+	}
+
+	return ans + time
 }

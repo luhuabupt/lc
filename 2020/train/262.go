@@ -169,3 +169,60 @@ func abs(a, b int) int {
 	}
 	return b - a
 }
+
+// 19：19
+func kthSmallestProduct(nums1 []int, nums2 []int, k int64) int64 {
+	p1, p2, n1, n2 := []int{}, []int{}, []int{}, []int{}
+	for _, v := range nums1 {
+		if v > 0 {
+			p1 = append(p1, v)
+		}
+	}
+	for i := len(nums1) - 1; i >= 0; i-- {
+		if nums1[i] < 0 {
+			n1 = append(n1, -nums1[i])
+		}
+	}
+	for _, v := range nums2 {
+		if v > 0 {
+			p2 = append(p2, v)
+		}
+	}
+	for i := len(nums2) - 1; i >= 0; i-- {
+		if nums2[i] < 0 {
+			n2 = append(n2, -nums2[i])
+		}
+	}
+
+	neg := int64(len(p1)*len(n2) + len(p2)*len(n1))
+	pos := int64(len(p1)*len(p2) + len(n1)*len(n2))
+	zero := int64((len(nums1) * len(nums2))) - neg - pos
+
+	if k <= neg {
+		k = neg - k + 1
+		return -int64(sort.Search(1e10, func(t int) bool {
+			cnt := int64(0)
+			for _, v := range p1 {
+				cnt += int64(sort.SearchInts(n2, t/v+1))
+			}
+			for _, v := range p2 {
+				cnt += int64(sort.SearchInts(n1, t/v+1))
+			}
+			return cnt >= k
+		}))
+	} else if k > neg+zero {
+		k -= neg + zero
+		return int64(sort.Search(1e10, func(t int) bool {
+			cnt := int64(0)
+			for _, v := range p1 {
+				cnt += int64(sort.SearchInts(p2, t/v+1))
+			}
+			for _, v := range n1 {
+				cnt += int64(sort.SearchInts(n2, t/v+1))
+			}
+			return cnt >= k
+		}))
+	} else {
+		return 0
+	}
+}
