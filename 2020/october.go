@@ -374,7 +374,273 @@ func maxProfit(inventory []int, orders int) int {
 	return ans
 }
 
+func createSortedArray_(instructions []int) int {
+	M := int(1e9) + 7
+	n := len(instructions)
+	//sort.Ints(instructions)
+	//fmt.Println(instructions)
+
+	arr := []int{}
+	ans := 0
+
+	for i := 0; i < n; i++ {
+		l := sort.SearchInts(arr, instructions[i])
+		r := sort.SearchInts(arr, instructions[i]+1)
+		ans += min_t(l, len(arr)-r)
+		ans %= M
+		x := append([]int{}, arr[l:]...)
+		arr = append(arr[:l], instructions[i])
+		arr = append(arr, x...)
+		fmt.Println(i, instructions[i], l, r, arr)
+	}
+
+	return ans
+}
+func min_t(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func removeInvalidParentheses(s string) []string {
+	arr := []byte(s)
+	m := map[int][]string{}
+	backtrack(arr, 0, 0, m, []byte{})
+	for i := len(arr); i >= 0; i-- {
+		if m[i] != nil {
+			hash := map[string]bool{}
+			for _, v := range m[i] {
+				hash[v] = true
+			}
+			ans := []string{}
+			for k, _ := range hash {
+				ans = append(ans, k)
+			}
+			return ans
+		}
+	}
+	return []string{""}
+}
+
+func backtrack(arr []byte, i, l int, m map[int][]string, cur []byte) {
+	//fmt.Println(i, l, cur)
+	if i == len(arr) {
+		if valid(cur) {
+			if m[len(cur)] == nil {
+				m[len(cur)] = []string{}
+			}
+			m[len(cur)] = append(m[len(cur)], string(cur))
+		}
+		return
+	}
+	if arr[i] >= 'a' && arr[i] <= 'z' {
+		backtrack(arr, i+1, l, m, append(cur, arr[i]))
+	} else if arr[i] == '(' {
+		backtrack(arr, i+1, l, m, append([]byte{}, cur...))
+		if l+1 <= len(arr)-i-1 {
+			backtrack(arr, i+1, l+1, m, append(cur, arr[i]))
+		}
+	} else {
+		backtrack(arr, i+1, l, m, append([]byte{}, cur...))
+		if l > 0 {
+			backtrack(arr, i+1, l-1, m, append(cur, arr[i]))
+		}
+	}
+}
+
+func valid(cur []byte) bool {
+	left := 0
+	for _, v := range cur {
+		if v == '(' {
+			left++
+		} else if v == ')' {
+			if left == 0 {
+				return false
+			}
+			left--
+		}
+	}
+	return left == 0
+}
+
+func reorderedPowerOf2(n int) bool {
+	m := map[string]bool{}
+	for i := 0; i <= 32; i++ {
+		m[f(1<<i)] = true
+	}
+
+	if m[f(n)] {
+		return true
+	}
+	return false
+}
+
+func f(n int) string {
+	x := []int{}
+	for n > 0 {
+		x = append(x, n%10)
+		n /= 10
+	}
+	sort.Ints(x)
+	ans := []byte{}
+	for _, v := range x {
+		ans = append(ans, byte(v))
+	}
+	return string(ans)
+}
+
+// 树状数组
+func createSortedArray(instructions []int) (cnt int) {
+	mod := 1000000007
+	tree := make([]int, 100001)
+	var sum func(i int) int
+	sum = func(i int) (x int) {
+		for j := i; j > 0; j -= (j & -j) {
+			x += tree[j]
+		}
+		return
+	}
+	for _, i := range instructions {
+		for j := i; j < len(tree); j += (j & -j) {
+			tree[j]++
+			fmt.Println(j, tree[j])
+		}
+		cnt = (cnt + min(sum(i-1), sum(100000)-sum(i))) % mod
+	}
+	fmt.Println(sum(100000))
+	return
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func isPathCrossing(path string) bool {
+	m := map[int]map[int]bool{0: {0: true}}
+	cur := []int{0, 0}
+	mv := map[byte][]int{'N': []int{0, 1}, 'E': []int{1, 0}, 'S': []int{0, -1}, 'W': []int{-1, 0}}
+	for _, v := range path {
+		idx := mv[byte(v)]
+		cur[0] += idx[0]
+		cur[1] += idx[1]
+		if m[cur[0]] == nil {
+			m[cur[0]] = map[int]bool{}
+		}
+		if m[cur[0]][cur[1]] {
+			return true
+		}
+		m[cur[0]][cur[1]] = true
+	}
+	return false
+}
+
+func canArrange(arr []int, k int) bool {
+	m := map[int]int{}
+	for _, v := range arr {
+		x := v % k
+		if x < 0 {
+			x += k
+		}
+		m[x]++
+	}
+	for i, v := range m {
+		if i == 0 {
+			if v&1 == 1 {
+				return false
+			}
+		} else {
+			if v != m[k-i] {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func numSubseq(nums []int, target int) int {
+	M := int(1e9) + 7
+	ans := 0
+	n := len(nums)
+	sort.Ints(nums)
+	i, j := 0, n-1
+	for i < j {
+		if nums[i]+nums[j] <= target {
+			ans += q_p(j - i)
+			ans %= M
+			i++
+		} else {
+			j--
+		}
+	}
+	if 2*nums[i] <= target {
+		ans++
+	}
+	return ans % M
+}
+
+func q_p(a int) int {
+	M := int(1e9) + 7
+	ans := 1
+	p := 2
+	for a > 0 {
+		if a&1 == 1 {
+			ans *= p
+			ans %= M
+		}
+		a /= 2
+		p *= p
+		p %= M
+	}
+	return ans
+}
+
+func modifyString(s string) string {
+	arr := []byte(s)
+	for i := 0; i < len(arr); i++ {
+		if arr[i] == '?' {
+			arr[i] = 'a'
+			for i > 0 && arr[i] == arr[i-1] || i <= len(arr)-2 && arr[i] == arr[i+1] {
+				arr[i]++
+			}
+		}
+	}
+	return string(arr)
+}
+
+func numTriplets(nums1 []int, nums2 []int) int {
+	sq1, sq2, p1, p2 := map[int]int{}, map[int]int{}, map[int]int{}, map[int]int{}
+	for _, v := range nums1 {
+		sq1[v*v]++
+	}
+	for _, v := range nums2 {
+		sq2[v*v]++
+	}
+	for i := 0; i < len(nums1)-1; i++ {
+		for j := i + 1; j < len(nums1); j++ {
+			p1[nums1[i]*nums1[j]]++
+		}
+	}
+	for i := 0; i < len(nums2)-1; i++ {
+		for j := i + 1; j < len(nums2); j++ {
+			p2[nums2[i]*nums2[j]]++
+		}
+	}
+
+	ans := 0
+	for k, v := range sq1 {
+		ans += v * p2[k]
+	}
+	for k, v := range sq2 {
+		ans += v * p1[k]
+	}
+
+	return ans
+}
+
 func main() {
-	fmt.Println(maxProfit([]int{680754224, 895956841, 524658639, 3161416, 992716630, 7365440, 582714485, 422256708, 332815744, 269407767}, 707568720))
-	//fmt.Println(maxProfit([]int{1,1,1,1000,10000}, 600))
+	fmt.Println(numSubseq([]int{27, 21, 14, 2, 15, 1, 19, 8, 12, 24, 21, 8, 12, 10, 11, 30, 15, 18, 28, 14, 26, 9, 2, 24, 23, 11, 7, 12, 9, 17, 30, 9, 28, 2, 14, 22, 19, 19, 27, 6, 15, 12, 29, 2, 30, 11, 20, 30, 21, 20, 2, 22, 6, 14, 13, 19, 21, 10, 18, 30, 2, 20, 28, 22}, 31))
 }

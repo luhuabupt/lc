@@ -1,8 +1,15 @@
 package main
 
-func main() {
-<<<<<<< HEAD
+import "fmt"
 
-=======
->>>>>>> a042a28d409728fe02764fa0e241725d3bdc115d
+type Abc struct {
+	node []*Abc
+}
+
+func main() {
+	for j := 100000; j > 0; j -= (j & -j) {
+		fmt.Println(j)
+		fmt.Printf("%#b ", j&-j)
+		fmt.Printf("%#b \n", j)
+	}
 }
