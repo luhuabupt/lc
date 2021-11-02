@@ -792,3 +792,269 @@ func countAndSay(n int) string {
 
 	return a[n]
 }
+
+func fourSum(nums []int, target int) [][]int {
+	sort.Ints(nums)
+	n := len(nums)
+	m := make([]map[int]int, n)
+	m[n-1] = map[int]int{nums[n-1]: 1}
+	for i := n - 2; i >= 0; i-- {
+		m[i] = map[int]int{}
+		for k, v := range m[i+1] {
+			m[i][k] = v
+		}
+		m[i][nums[i]]++
+	}
+	ans := [][]int{}
+	for i := 0; i < n-3; i++ {
+		for j := i + 1; j < n-2; j++ {
+			for x := j + 1; x < n-1; x++ {
+				if m[x+1][target-nums[i]-nums[j]-nums[x]] > 0 {
+					ans = append(ans, []int{nums[i], nums[j], nums[x], target - nums[i] - nums[j] - nums[x]})
+				}
+			}
+		}
+	}
+
+	if len(ans) == 0 {
+		return ans
+	}
+
+	return dup(ans)
+}
+
+func dup(a [][]int) [][]int {
+	res := [][]int{}
+	m := map[int]map[int]map[int]map[int]bool{}
+	for _, v := range a {
+		if m[v[0]] == nil {
+			m[v[0]] = map[int]map[int]map[int]bool{}
+		}
+		if m[v[0]][v[1]] == nil {
+			m[v[0]][v[1]] = map[int]map[int]bool{}
+		}
+		if m[v[0]][v[1]][v[2]] == nil {
+			m[v[0]][v[1]][v[2]] = map[int]bool{}
+		}
+		if !m[v[0]][v[1]][v[2]][v[3]] {
+			res = append(res, v)
+		}
+	}
+	return res
+}
+
+// 记忆搜索
+func shoppingOffers(price []int, special [][]int, needs []int) int {
+	ns := [][]int{}
+	n := len(price)
+	for _, arr := range special {
+		x := 0
+		for i := 0; i < n; i++ {
+			if arr[i] > needs[i] {
+				x = -1
+				break
+			}
+			x += price[i] * arr[i]
+		}
+		if arr[n] < x {
+			ns = append(ns, arr)
+		}
+	}
+
+	dp := map[string]int{}
+
+	var dfs func(s []byte)
+	dfs = func(s []byte) {
+		min := 0
+		for i, v := range s {
+			min += price[i] * int(v)
+		}
+		for _, arr := range ns { // 大礼包
+			flag := true
+			todo := []byte{} // 还差
+			for i, v := range s {
+				if arr[i] > int(v) {
+					flag = false
+					break
+				}
+				todo = append(todo, v-byte(arr[i]))
+			}
+			if !flag { // 无效
+				continue
+			}
+
+			if _, ok := dp[string(todo)]; !ok { // 记忆搜索
+				dfs(todo)
+			}
+			if dp[string(todo)]+arr[n] < min {
+				min = dp[string(todo)] + arr[n]
+			}
+		}
+	}
+
+	x := []byte{}
+	for _, v := range needs {
+		x = append(x, byte(v))
+	}
+	dfs(x)
+
+	return dp[string(x)]
+}
+
+// 有向图dfs
+func largestPathValue(colors string, edges [][]int) int {
+	n := len(colors)
+	max := 0
+	hasLoop := false
+	vis := make([]int, n)
+	dp := make([][26]int, n)
+
+	c := make([]int, n)
+	for i, v := range colors {
+		c[i] = int(v - 'a')
+	}
+
+	notRoot := map[int]bool{}
+	sub := make([][]int, n)
+	for _, arr := range edges {
+		sub[arr[0]] = append(sub[arr[0]], arr[1])
+		notRoot[arr[1]] = true
+	}
+	root := []int{}
+	for i := 0; i < n; i++ {
+		if !notRoot[i] {
+			root = append(root, i)
+		}
+	}
+	if len(root) == 0 {
+		return -1
+	}
+
+	var dfs func(pre, x int)
+	dfs = func(pre, x int) {
+		vis[x] = 1
+
+		for _, v := range sub[x] {
+			if vis[v] == 1 {
+				hasLoop = true
+				return
+			}
+			if vis[v] == 0 {
+				dfs(x, v)
+			}
+			for char := 0; char < 26; char++ {
+				if dp[v][char] > dp[x][char] {
+					dp[x][char] = dp[v][char]
+				}
+			}
+		}
+
+		dp[x][c[x]]++
+		if dp[x][c[x]] > max {
+			max = dp[x][c[x]]
+		}
+
+		vis[x] = 2
+	}
+
+	for _, v := range root {
+		dfs(-1, v)
+	}
+	if hasLoop {
+		return -1
+	}
+	for i := 0; i < n; i++ {
+		if vis[i] != 2 {
+			return -1
+		}
+	}
+
+	return max
+}
+
+func shiftingLetters(s string, shifts []int) string {
+	n := len(s)
+	sum := make([]int, n)
+	for i, v := range shifts {
+		if i == n-1 {
+			sum[i] = v
+		} else {
+			sum[i] = sum[i+1] + v
+		}
+	}
+	ans := make([]byte, n)
+	for i := 0; i < n; i++ {
+		ans[i] = byte((int(s[i]-'a')+sum[i])%26 + 'a')
+	}
+	return string(ans)
+}
+
+/**
+ * Definition for a binary tree node.
+ * type TreeNode struct {
+ *     Val int
+ *     Left *TreeNode
+ *     Right *TreeNode
+ * }
+ */
+func maxSumBST(root *TreeNode) int {
+	var dfs func(p *TreeNode) (ban bool, sum, min, max int)
+	ans := 0
+
+	dfs = func(p *TreeNode) (ban bool, sum, min, max int) {
+		if p.Left == nil && p.Right == nil {
+			if p.Val > ans {
+				ans = p.Val
+			}
+			return true, p.Val, p.Val, p.Val
+		}
+
+		b1, b2, s1, s2, i1, a1, i2, a2 := true, true, 0, 0, 100000, -100000, 100000, -100000
+		if p.Left != nil {
+			b1, s1, i1, a1 = dfs(p.Left)
+			if a1 >= p.Val {
+				b1 = false
+			}
+		}
+		if p.Right != nil {
+			b2, s2, i2, a2 = dfs(p.Right)
+			if a2 <= p.Val {
+				b2 = false
+			}
+		}
+
+		if b1 && b2 {
+			ban, sum = true, s1+s2+p.Val
+			if sum > ans {
+				ans = sum
+			}
+		}
+
+		min = min3(i1, i2, p.Val)
+		max = max3(a1, a2, p.Val)
+
+		return
+	}
+
+	dfs(root)
+	return ans
+}
+
+func min3(a, b, c int) int {
+	if a < b && a < c {
+		return a
+	}
+	if b < c {
+		return b
+	}
+	return c
+}
+func max3(a, b, c int) int {
+	if a > b && a > c {
+		return a
+	}
+	if b > c {
+		return b
+	}
+	return c
+}
