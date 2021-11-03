@@ -697,7 +697,7 @@ func count(s string) map[string]int {
 
 func main() {
 	fmt.Println(numOfArrays(2, 3, 1))
-	//fmt.Println(numOfArrays(50,100,25))
+	fmt.Println(numOfArrays(50, 100, 25))
 	fmt.Println(numOfArrays(9, 1, 1))
 }
 
@@ -761,7 +761,11 @@ func numOfArrays(n int, m int, k int) int {
 
 	var dfs func(i, j, x, cur int)
 	dfs = func(i0, j0, x0, cur int) { // i当前位置  j当前值 x剩余coast
+		if x0 < 0 {
+			return
+		}
 		if x0 == 0 {
+			//fmt.Println(i0, j0, x0, j0+1, n-i0, qckP(j0+1, n-i0))
 			dp[i0][j0][x0] = cur * qckP(j0+1, n-i0) % M
 			return
 		}
@@ -781,9 +785,9 @@ func numOfArrays(n int, m int, k int) int {
 	ans := 0
 	for j := 0; j < m; j++ {
 		dfs(1, j, k-1, 1)
-		ans += dp[0][j][k]
+		ans += dp[1][j][k-1]
 	}
-	fmt.Println(dp)
+	//fmt.Println(dp)
 
 	return ans
 }
@@ -792,7 +796,7 @@ func qckP(a, n int) int {
 	M := int(1e9) + 7
 	ans := 1
 	for n > 0 {
-		if n&2 == 1 {
+		if n&1 == 1 {
 			ans *= a
 			ans %= M
 		}
