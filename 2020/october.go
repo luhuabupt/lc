@@ -641,6 +641,168 @@ func numTriplets(nums1 []int, nums2 []int) int {
 	return ans
 }
 
+func countSubstrings(s string, t string) int {
+	ans := 0
+	for i := 0; i < len(s); i++ {
+		for j := 0; j < len(t); j++ {
+			if s[i] == t[j] {
+				continue
+			}
+			l, r := 1, 1
+			for i-l >= 0 && j-l >= 0 && s[i-l] == t[j-l] {
+				l++
+			}
+			for i+r < len(s) && j+r < len(t) && s[i+r] == t[j+r] {
+				r++
+			}
+			ans += l * r
+		}
+	}
+	return ans
+}
+
+func countSubstrings_(s string, t string) int {
+	ans := 0
+	a := count(s)
+	b := count(t)
+	for v, cnt := range a {
+		for i := 0; i < len(v); i++ {
+			for j := 'a'; j <= 'z'; j++ {
+				if j == int32(v[i]) {
+					continue
+				}
+				x := []byte(v)
+				x[i] = byte(j)
+				ans += cnt * b[string(x)]
+			}
+		}
+	}
+	return ans
+}
+
+func count(s string) map[string]int {
+	cnt := map[string]int{}
+	//sum := map[string]int{}
+	arr := []byte(s)
+	for i := 0; i < len(arr); i++ {
+		cur := []byte{}
+		for j := i; j < len(arr); j++ {
+			cur = append(cur, arr[j])
+			cnt[string(cur)]++
+			//sum[string(cur[:len(cur)-1])]++
+		}
+	}
+	return cnt
+}
+
 func main() {
-	fmt.Println(numSubseq([]int{27, 21, 14, 2, 15, 1, 19, 8, 12, 24, 21, 8, 12, 10, 11, 30, 15, 18, 28, 14, 26, 9, 2, 24, 23, 11, 7, 12, 9, 17, 30, 9, 28, 2, 14, 22, 19, 19, 27, 6, 15, 12, 29, 2, 30, 11, 20, 30, 21, 20, 2, 22, 6, 14, 13, 19, 21, 10, 18, 30, 2, 20, 28, 22}, 31))
+	fmt.Println(numOfArrays(2, 3, 1))
+	fmt.Println(numOfArrays(50, 100, 25))
+	fmt.Println(numOfArrays(9, 1, 1))
+}
+
+func numWays(words []string, target string) int {
+	M := int(1e9) + 7
+	ans := 0
+	cnt := make([]map[int]int, 26) // 记录每个字符每个index出现次数
+
+	mx, n := 0, len(target)
+	for i, _ := range cnt {
+		cnt[i] = map[int]int{}
+	}
+	for _, s := range words {
+		if len(s) > mx {
+			mx = len(s)
+		}
+		for i, v := range s {
+			cnt[v-'a'][i]++
+		}
+	}
+
+	dp := make([][]int, len(target)) // dp[i][k] target第i个字符选到了k位置
+	for i := 0; i < n; i++ {
+		dp[i] = make([]int, mx)
+		st := target[i] - 'a'
+		tmp := 0
+		for k := i; k < mx-(n-1-i); k++ {
+			if i == 0 {
+				tmp = 1
+			} else {
+				tmp += dp[i-1][k-1]
+			}
+			if cnt[st][k] > 0 {
+				// dp[i][k] = dp[i-1][{k所有可能的位置累加}]
+				dp[i][k] += tmp * cnt[st][k]
+				dp[i][k] %= M
+			}
+		}
+	}
+
+	for _, v := range dp[n-1] {
+		ans += v
+		ans %= M
+	}
+	return ans
+}
+
+func numOfArrays(n int, m int, k int) int {
+	if k > m {
+		return 0
+	}
+
+	M := int(1e9) + 7
+	dp := make([][][]int, n)
+	for i := 0; i < n; i++ {
+		dp[i] = make([][]int, m)
+		for j := 0; j < m; j++ {
+			dp[i][j] = make([]int, k+1)
+		}
+	}
+
+	var dfs func(i, j, x, cur int)
+	dfs = func(i0, j0, x0, cur int) { // i当前位置  j当前值 x剩余coast
+		if x0 < 0 {
+			return
+		}
+		if x0 == 0 {
+			//fmt.Println(i0, j0, x0, j0+1, n-i0, qckP(j0+1, n-i0))
+			dp[i0][j0][x0] = cur * qckP(j0+1, n-i0) % M
+			return
+		}
+
+		t := 0
+		for i := i0; i < n-1; i++ {
+			for j := j0; j < m; j++ {
+				if dp[i+1][j][x0-1] == 0 {
+					dfs(i+1, j, x0-1, cur*qckP(j0+1, i-i0))
+				}
+				t += cur * dp[i+1][j][x0-1] % M
+			}
+		}
+		dp[i0][j0][x0] = t % M
+	}
+
+	ans := 0
+	for j := 0; j < m; j++ {
+		dfs(1, j, k-1, 1)
+		ans += dp[1][j][k-1]
+	}
+	//fmt.Println(dp)
+
+	return ans
+}
+
+func qckP(a, n int) int {
+	M := int(1e9) + 7
+	ans := 1
+	for n > 0 {
+		if n&1 == 1 {
+			ans *= a
+			ans %= M
+		}
+		n /= 2
+		a *= a
+		a %= M
+	}
+	return ans % M
 }

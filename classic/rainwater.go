@@ -1,7 +1,7 @@
 package classic
 
 // https://leetcode-cn.com/problems/trapping-rain-water/
-func trap(height []int) int {
+func trap_(height []int) int { // 双单调栈
 	n := len(height)
 	l, r := make([]int, n), make([]int, n) // 不包含i的最大值
 
@@ -13,7 +13,7 @@ func trap(height []int) int {
 		}
 	}
 
-	for i := n - 2; i >= 0; i--{
+	for i := n - 2; i >= 0; i-- {
 		r[i] = r[i+1]
 		if height[i+1] > r[i+1] {
 			r[i] = height[i+1]
@@ -32,26 +32,24 @@ func trap(height []int) int {
 }
 
 // 双指针
-func trap_(height []int) int {
+func trap(height []int) int {
 	n := len(height)
+	l, r := 0, 0 // 包含i, j
+	i, j, ans := 0, n-1, 0
 
-	l, r := height[0], height[n-1] // 不包含i, j
-	i, j, ans := 1, n-2, 0
 	for i < j {
+		if height[i] > l {
+			l = height[i]
+		}
+		if height[j] > r {
+			r = height[j]
+		}
 		if l < r {
+			ans += l - height[i]
 			i++
-			if height[i] < l {
-				ans += l - height[i]
-			} else {
-				l = height[i]
-			}
 		} else {
+			ans += r - height[j]
 			j--
-			if height[j] < r {
-				ans += r - height[i]
-			} else {
-				ans = height[j]
-			}
 		}
 	}
 
