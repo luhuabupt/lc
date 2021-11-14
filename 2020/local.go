@@ -1058,3 +1058,42 @@ func max3(a, b, c int) int {
 	}
 	return c
 }
+
+type MapSum struct {
+	next [26]*MapSum
+	val  int
+}
+
+func Constructor() MapSum {
+	return MapSum{
+		next: [26]*MapSum{},
+		val:  0,
+	}
+}
+
+func (this *MapSum) Insert(key string, val int) {
+	p := this
+	for _, v := range key {
+		if p.next[v-'a'] == nil {
+			p.next[v-'a'] = &MapSum{}
+		}
+		p = p.next[v-'a']
+	}
+	p.val = val
+}
+
+func (this *MapSum) Sum(prefix string) int {
+	ans := 0
+	for _, v := range prefix {
+		ans += this.next[v-'a'].val
+		this = this.next[v-'a']
+	}
+	return ans
+}
+
+/**
+ * Your MapSum object will be instantiated and called as such:
+ * obj := Constructor();
+ * obj.Insert(key,val);
+ * param_2 := obj.Sum(prefix);
+ */
