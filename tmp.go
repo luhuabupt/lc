@@ -7,9 +7,10 @@ type Abc struct {
 }
 
 func main() {
-	for j := 100000; j > 0; j -= (j & -j) {
-		fmt.Println(j)
-		fmt.Printf("%#b ", j&-j)
-		fmt.Printf("%#b \n", j)
+	a := []int{1, 2, 3}
+	for _, v := range a {
+		a = append(a, 100+v)
+		a = append(a, 10+v)
 	}
+	fmt.Println(a)
 }

@@ -1097,3 +1097,134 @@ func (this *MapSum) Sum(prefix string) int {
  * obj.Insert(key,val);
  * param_2 := obj.Sum(prefix);
  */
+
+func findClosestElements(arr []int, k int, x int) []int {
+	idx := sort.SearchInts(arr, x)
+	n := len(arr)
+
+	m := map[int]bool{}
+	for l, r := idx-1, idx; k > 0; {
+		if r == n || x-arr[l] <= arr[r]-x {
+			m[arr[l]] = true
+			l--
+		} else {
+			m[arr[r]] = true
+			r++
+		}
+		k--
+	}
+
+	ans := []int{}
+	for _, v := range arr {
+		if m[v] {
+			ans = append(ans, v)
+		}
+	}
+
+	return ans
+}
+
+/**
+ * Definition for a binary tree node.
+ * type TreeNode struct {
+ *     Val int
+ *     Left *TreeNode
+ *     Right *TreeNode
+ * }
+ */
+func getDirections(root *TreeNode, startValue int, destValue int) string {
+	res := map[int][][]int{}
+	res[startValue] = [][]int{}
+	res[destValue] = [][]int{}
+
+	var dfs func(find int, p *TreeNode) (path, road []int)
+	dfs = func(find int, p *TreeNode) (path, road []int) {
+		if p == nil {
+			return
+		}
+		if p.Val == find {
+			return []int{p.Val}, []int{}
+		}
+		pa, ro := dfs(find, p.Left)
+		if len(pa) > 0 {
+			return append(pa, p.Val), append(ro, 0)
+		}
+		par, ror := dfs(find, p.Left)
+		if len(par) > 0 {
+			return append(par, p.Val), append(ror, 1)
+		}
+		return
+	}
+
+	sp, sr := dfs(startValue, root)
+	ep, er := dfs(destValue, root)
+
+	re(sp)
+	re(sr)
+	re(ep)
+	re(er)
+
+	idx := -1
+	for i := 0; i < len(ep) && i < len(sp); i++ {
+		if ep[i] != sp[i] {
+			break
+		}
+		idx++
+	}
+
+	ans := []byte{}
+	for i := len(sr) - 1; i >= idx; i-- {
+		ans = append(ans, 'U')
+	}
+	for i := idx; i < len(er); i++ {
+		if er[i] == 0 {
+			ans = append(ans, 'L')
+		} else {
+			ans = append(ans, 'R')
+		}
+	}
+	return string(ans)
+}
+
+func re(a []int) {
+	n := len(a)
+	for i := 0; i < n/2; i++ {
+		a[i], a[n-1-i] = a[n-1-i], a[i]
+	}
+}
+
+func superPow(a int, b []int) int {
+	if a == 1 {
+		return 1
+	}
+	M := int(1e9 + 7)
+
+	var pow func(a, n int) int
+	pow = func(a, n int) int {
+		fmt.Println(a, n)
+		ans := 1
+		for n > 0 {
+			if n%2 == 1 {
+				ans *= a
+			}
+			n /= 2
+			a *= a
+			a %= M
+			ans %= M
+		}
+		fmt.Println(ans)
+		return ans
+	}
+
+	p, p0 := a%M, pow(a%M, 9)%M
+	ans := 0
+	for i := len(b) - 1; i >= 0; i-- {
+		if b[i] > 0 {
+			ans += pow(p, b[i])
+			ans %= M
+		}
+		p = p * p0 % M
+	}
+
+	return ans
+}

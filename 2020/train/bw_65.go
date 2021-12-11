@@ -103,13 +103,3 @@ func maximumBeauty(items [][]int, queries []int) []int {
 
 	return ans
 }
-
-func maxTaskAssign(tasks []int, workers []int, pills int, strength int) int {
-	//n := len(tasks)
-	//m := len(workers)
-	//
-	//sort.Ints(tasks)
-	//sort.Ints(workers)
-	return 0
-
-}
