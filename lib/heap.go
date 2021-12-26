@@ -8,7 +8,7 @@ import (
 type h []int
 
 func (h h) Len() int            { return len(h) }
-func (h h) Less(i, j int) bool  { return h[i] > h[j] }
+func (h h) Less(i, j int) bool  { return h[i] < h[j] } // 小顶堆
 func (h h) Swap(i, j int)       { h[i], h[j] = h[j], h[i] }
 func (h *h) Push(v interface{}) { *h = append(*h, v.(int)) }
 func (h *h) Pop() interface{} {
