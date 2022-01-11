@@ -16,3 +16,8 @@
 
 #idea
 .idea/
+
+vendor
+
+#go
+tmp.go

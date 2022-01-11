@@ -5,8 +5,24 @@ import (
 	"sort"
 )
 
-type Abc struct {
-	node []*Abc
+// stack represents a stack of program counters.
+type stack []uintptr
+
+type withStack struct {
+	error
+	*stack
+}
+
+type withMessage struct {
+	cause error
+	msg   string
+}
+
+type TaskMsg struct {
+	ActionType int   `json:"actionType"`
+	ActionId   int64 `json:"actionId"`
+	Mid        int64 `json:"mid"`
+	Ts         int64 `json:"date"`
 }
 
 func main() {

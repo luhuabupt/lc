@@ -697,8 +697,10 @@ func count(s string) map[string]int {
 
 func main() {
 	fmt.Println(numOfArrays(2, 3, 1))
+	fmt.Println(numOfArrays(2, 3, 2))
+	fmt.Println(numOfArrays(3, 10, 1))
 	fmt.Println(numOfArrays(50, 100, 25))
-	fmt.Println(numOfArrays(9, 1, 1))
+	fmt.Println(numOfArrays(37, 17, 7))
 }
 
 func numWays(words []string, target string) int {
@@ -745,64 +747,66 @@ func numWays(words []string, target string) int {
 	return ans
 }
 
+// n = 50, m = 100, k = 25
+// 输出：34549172
+// n = 37, m = 17, k = 7
+// 输出：418930126
 func numOfArrays(n int, m int, k int) int {
 	if k > m {
 		return 0
 	}
 
 	M := int(1e9) + 7
-	dp := make([][][]int, n)
+	dp := make([][][]int, n)  // i, 当前值j-1, 剩余coast
+	sum := make([][][]int, n) // dp[j]前缀和
 	for i := 0; i < n; i++ {
 		dp[i] = make([][]int, m)
+		sum[i] = make([][]int, m)
 		for j := 0; j < m; j++ {
-			dp[i][j] = make([]int, k+1)
+			dp[i][j] = make([]int, k)
+			sum[i][j] = make([]int, k)
 		}
 	}
 
-	var dfs func(i, j, x, cur int)
-	dfs = func(i0, j0, x0, cur int) { // i当前位置  j当前值 x剩余coast
-		if x0 < 0 {
-			return
-		}
-		if x0 == 0 {
-			//fmt.Println(i0, j0, x0, j0+1, n-i0, qckP(j0+1, n-i0))
-			dp[i0][j0][x0] = cur * qckP(j0+1, n-i0) % M
-			return
-		}
+	for i := 0; i < n; i++ {
+		for j := 0; j < m; j++ { // 选出作为max
+			if i == 0 {
+				dp[0][j][k-1] = 1
+				sum[0][j][k-1] = j + 1
+				continue
+			}
+			//for jj := 0; jj < m; jj++ { // 累加前一个
+			//	for x := 0; x < k; x++ {
+			//		if x > 0 && j > jj { // 比前面大
+			//			dp[i][j][x-1] += dp[i-1][jj][x]
+			//		} else if j <= jj {
+			//			dp[i][jj][x] += dp[i-1][jj][x]
+			//		}
+			//		dp[i][j][x] %= M
+			//	}
+			//}
 
-		t := 0
-		for i := i0; i < n-1; i++ {
-			for j := j0; j < m; j++ {
-				if dp[i+1][j][x0-1] == 0 {
-					dfs(i+1, j, x0-1, cur*qckP(j0+1, i-i0))
+			for x := 0; x < k; x++ {
+				dp[i][j][x] = dp[i-1][j][x] * (j + 1)
+				if j > 0 && x+1 < k {
+					dp[i][j][x] += sum[i-1][j-1][x+1]
 				}
-				t += cur * dp[i+1][j][x0-1] % M
+				dp[i][j][x] %= M
+
+				sum[i][j][x] = dp[i][j][x]
+				if j > 0 {
+					sum[i][j][x] += sum[i][j-1][x]
+				}
+				sum[i][j][x] %= M
 			}
 		}
-		dp[i0][j0][x0] = t % M
 	}
 
-	ans := 0
-	for j := 0; j < m; j++ {
-		dfs(1, j, k-1, 1)
-		ans += dp[1][j][k-1]
-	}
-	//fmt.Println(dp)
+	//ans := 0
+	//for j := 0; j < n; j++ {
+	//	ans += dp[n-1][j][0]
+	//}
+	//return ans
 
-	return ans
-}
-
-func qckP(a, n int) int {
-	M := int(1e9) + 7
-	ans := 1
-	for n > 0 {
-		if n&1 == 1 {
-			ans *= a
-			ans %= M
-		}
-		n /= 2
-		a *= a
-		a %= M
-	}
-	return ans % M
+	return sum[n-1][m-1][0]
 }
