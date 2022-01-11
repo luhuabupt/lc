@@ -10,9 +10,13 @@ type Abc struct {
 }
 
 func main() {
-	fmt.Println(findMaxUp([]int{1, 2, 3}))
-	fmt.Println(findMaxUp([]int{1, 2, 2}))
-	fmt.Println(findMaxUp([]int{1, 2, 2, 2, 3, 3}))
+	for v := 1; v <= 9; v++ {
+		for i := 1; i <= 3; i++ { //m
+			fmt.Println(v, i, sort.Search(3, func(vv int) bool {
+				return (vv+1)*i >= v
+			}))
+		}
+	}
 }
 
 // 最长上升子序列
