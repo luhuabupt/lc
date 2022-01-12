@@ -346,7 +346,7 @@ func smallestRange(nums [][]int) []int {
 
 	sort.Slice(arr, func(i, j int) bool {
 		return arr[i].val < arr[j].val || arr[i].val == arr[j].val && arr[i].k == arr[j].k
- 	})
+	})
 
 	ans := []int{}
 	return ans
@@ -377,4 +377,24 @@ func repeatedStringMatch(a string, b string) int {
 	}
 
 	return -1
+}
+
+func gcdSort(nums []int) bool {
+	n := len(nums)
+	pa := make([]int, n)
+
+	var find func(i int) int
+	find = func(i int) int {
+		if i == pa[i] {
+			return i
+		}
+		return find(pa[i])
+	}
+
+	union := func(i, j int) {
+		if pa[i] == pa[j] {
+			return
+		}
+
+	}
 }
