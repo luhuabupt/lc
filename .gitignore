@@ -20,3 +20,5 @@
 vendor
 
 #go
+tmp.go
+test.go
