@@ -346,7 +346,7 @@ func smallestRange(nums [][]int) []int {
 
 	sort.Slice(arr, func(i, j int) bool {
 		return arr[i].val < arr[j].val || arr[i].val == arr[j].val && arr[i].k == arr[j].k
- 	})
+	})
 
 	ans := []int{}
 	return ans
@@ -377,4 +377,116 @@ func repeatedStringMatch(a string, b string) int {
 	}
 
 	return -1
+}
+
+func findRedundantDirectedConnection_(edges [][]int) []int {
+	n := len(edges)
+	vis := make([]bool, n+1)
+	sub := make([][]int, n+1)
+	for i, _ := range sub {
+		sub[i] = []int{}
+	}
+
+	var dfs func(i int) bool
+	dfs = func(i int) bool {
+		vis[i] = true
+		for _, v := range sub[i] {
+			if vis[v] || dfs(v) {
+				return true
+			}
+		}
+		return false
+	}
+
+	in := make([]int, n+1)
+	root := edges[0][0]
+	for _, e := range edges {
+		sub[e[0]] = append(sub[e[0]], e[1])
+		in[e[1]]++
+		if root == e[1] {
+			if in[e[0]] > 0 {
+				return e
+			} else {
+				root = e[0]
+			}
+		}
+		vis = make([]bool, n+1)
+		if dfs(root) {
+			return e
+		}
+	}
+	return []int{}
+}
+
+func findRedundantDirectedConnection(edges [][]int) []int {
+	n := len(edges)
+	in := make([]int, n+1)
+	two := 0
+	for _, e := range edges {
+		in[e[1]]++
+		if in[e[1]] == 2 {
+			two = e[1]
+		}
+	}
+
+	sub := make([][]int, n+1)
+	for _, e := range edges {
+		sub[e[0]] = append(sub[e[0]], e[1])
+	}
+
+	if two > 0 {
+		root := 0
+		for i := 1; i <= n; i++ {
+			if in[i] == 0 {
+				root = i
+			}
+		}
+
+		vis := make([]bool, n+1)
+		var dfs func(i, del int)
+		dfs = func(i, del int) {
+			vis[i] = true
+			for _, v := range sub[i] {
+				if !vis[v] {
+					if i == edges[del][0] && v == edges[del][1] {
+						continue
+					}
+					dfs(v, del)
+				}
+			}
+		}
+		// fmt.Println(sub, root)
+
+		for i := len(edges) - 1; i >= 0; i-- {
+			vis = make([]bool, n+1)
+			if edges[i][1] == two {
+				dfs(root, i)
+				//fmt.Println(i, vis)
+				cnt := 0
+				for _, v := range vis {
+					if v {
+						cnt++
+					}
+				}
+				//fmt.Println(i, cnt, n)
+				if cnt == n {
+					return edges[i]
+				}
+			}
+		}
+	}
+
+	in = make([]int, n+1)
+	root := edges[0][0]
+	for _, e := range edges {
+		in[e[1]]++
+		if root == e[1] {
+			if in[e[0]] == 1 {
+				return e
+			} else {
+				root = e[0]
+			}
+		}
+	}
+	return []int{}
 }
