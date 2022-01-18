@@ -22,3 +22,7 @@ vendor
 #go
 tmp.go
 test.go
+
+# leetcode
+2022/auto/leetcode/editor/cn/all.json
+2022/auto/leetcode/editor/cn/translation.json
