@@ -23,6 +23,11 @@ vendor
 tmp.go
 test.go
 
+<<<<<<< HEAD
 # leetcode
 2022/auto/leetcode/editor/cn/all.json
 2022/auto/leetcode/editor/cn/translation.json
+=======
+#lc
+*.json
+>>>>>>> 366e0dee51a2c6ecefa4ddab5d4afec6fc2d06a9
