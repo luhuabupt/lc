@@ -113,12 +113,6 @@ func get(a string) string {
 	ans[1] = a[0]
 	return string(ans)
 }
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
 
 func main() {
 	//fmt.Println(possibleToStamp([][]int{{1, 0, 0, 0}, {1, 0, 0, 0}, {1, 0, 0, 0}, {1, 0, 0, 0}, {1, 0, 0, 0}}, 4, 3))
