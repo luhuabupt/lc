@@ -1,8 +1,9 @@
-package lib
+package main
 
 import (
 	"container/heap"
 	"fmt"
+	"sort"
 )
 
 type h []int
@@ -18,15 +19,37 @@ func (h *h) Pop() interface{} {
 	return v
 }
 
+// 小顶堆
+type sh struct{ sort.IntSlice }
+
+func (sh) Push(interface{})     {}
+func (sh) Pop() (_ interface{}) { return }
+
+// 大顶堆
+type bh struct{ sort.IntSlice }
+
+func (h bh) Less(i, j int) bool { return h.IntSlice[i] > h.IntSlice[j] }
+func (bh) Push(interface{})     {}
+func (bh) Pop() (_ interface{}) { return }
+
 // @see http://cngolib.com/container-heap.html
 func main() {
-	h := &h{}
+	h := &bh{}
 	heap.Push(h, 3)
 	heap.Push(h, 8)
+
 	heap.Push(h, 2)
 	heap.Push(h, 7)
 	heap.Push(h, 1)
 	heap.Push(h, 4)
+	x := heap.Pop(h).(int)
+	fmt.Println(x)
+
+	x = heap.Pop(h).(int)
+	fmt.Println(x)
+
+	x = heap.Pop(h).(int)
+	fmt.Println(x)
 	fmt.Println(h)
 	for h.Len() > 0 {
 		fmt.Printf("%d ", heap.Pop(h))
