@@ -19,39 +19,62 @@ func (h *h) Pop() interface{} {
 	return v
 }
 
-// 小顶堆
-type sh struct{ sort.IntSlice }
+type hl []int
 
-func (sh) Push(interface{})     {}
-func (sh) Pop() (_ interface{}) { return }
+func (h hl) Len() int            { return len(h) }
+func (h hl) Less(i, j int) bool  { return h[i] > h[j] } // 大顶堆
+func (h hl) Swap(i, j int)       { h[i], h[j] = h[j], h[i] }
+func (h *hl) Push(v interface{}) { *h = append(*h, v.(int)) }
+func (h *hl) Pop() interface{} {
+	a := *h
+	v := a[len(a)-1]
+	*h = a[:len(a)-1]
+	return v
+}
 
-// 大顶堆
-type bh struct{ sort.IntSlice }
+type minHeap struct{ sort.IntSlice }
 
-func (h bh) Less(i, j int) bool { return h.IntSlice[i] > h.IntSlice[j] }
-func (bh) Push(interface{})     {}
-func (bh) Pop() (_ interface{}) { return }
+func (minHeap) Push(interface{})     {}
+func (minHeap) Pop() (_ interface{}) { return }
+
+type maxHeap struct{ sort.IntSlice }
+
+func (h maxHeap) Less(i, j int) bool { return h.IntSlice[i] > h.IntSlice[j] }
+func (maxHeap) Push(interface{})     {}
+func (maxHeap) Pop() (_ interface{}) { return }
+
+func min(a, b int) int {
+	if a > b {
+		return b
+	}
+	return a
+}
 
 // @see http://cngolib.com/container-heap.html
 func main() {
-	h := &bh{}
+	arr()
+	sortSlice()
+}
+
+func arr() {
+	h := &h{}
 	heap.Push(h, 3)
-	heap.Push(h, 8)
-
-	heap.Push(h, 2)
-	heap.Push(h, 7)
-	heap.Push(h, 1)
 	heap.Push(h, 4)
-	x := heap.Pop(h).(int)
-	fmt.Println(x)
+	heap.Push(h, 2)
+	heap.Push(h, 5)
+	heap.Push(h, 1)
 
-	x = heap.Pop(h).(int)
-	fmt.Println(x)
-
-	x = heap.Pop(h).(int)
-	fmt.Println(x)
-	fmt.Println(h)
 	for h.Len() > 0 {
 		fmt.Printf("%d ", heap.Pop(h))
 	}
+}
+
+func sortSlice() {
+	mh := minHeap{[]int{3, 5, 2, 7, 4, 6, 1}}
+	heap.Init(&mh)
+
+	// pop push 操作
+	// i = 0, 等价于: 先remove(h, i) 再push
+	mh.IntSlice[0] = 5
+	heap.Fix(&mh, 0)
 }
