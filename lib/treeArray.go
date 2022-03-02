@@ -7,10 +7,8 @@ type tree struct {
 }
 
 func (t tree) add(i, v int) {
-	fmt.Println(i)
 	for i < len(t.arr) {
 		t.arr[i] = t.arr[i] + v
-		fmt.Println(lowbit(i), i+lowbit(i))
 		i += lowbit(i)
 	}
 }
