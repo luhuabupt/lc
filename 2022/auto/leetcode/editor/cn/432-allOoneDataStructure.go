@@ -1,202 +1,97 @@
 package main
 
-import "fmt"
+import (
+	"container/list"
+	"fmt"
+)
 
 func main() {
 	obj := Constructor()
-	//obj.Inc("hello")
-	//fmt.Println("get: ", obj.GetMaxKey(), "|", obj.GetMinKey())
-	//obj.Inc("hello")
-	//fmt.Println("get: ", obj.GetMaxKey(), "|", obj.GetMinKey())
-	//obj.Inc("leet")
-	//fmt.Println("get: ", obj.GetMaxKey(), "|", obj.GetMinKey())
-	//obj.Dec("hello")
-	//fmt.Println("get: ", obj.GetMaxKey(), "|", obj.GetMinKey())
-	//obj.Dec("hello")
-	//fmt.Println("get: ", obj.GetMaxKey(), "|", obj.GetMinKey())
-	//obj.Dec("leet")
-	//obj.Inc("leet")
-	//fmt.Println("get: ", obj.GetMaxKey(), "|", obj.GetMinKey())
-	a := []string{"a", "b", "b", "c", "c", "c", "b", "b", "a"}
-	b := []int{1, 1, 1, 1, 1, 1, 0, 0, 0}
-
-	for i, x := range b {
-		if x == 1 {
-			obj.Inc(a[i])
-		} else {
-			obj.Dec(a[i])
-		}
-		fmt.Println(obj.GetMaxKey(), "|", obj.GetMinKey())
-	}
+	fmt.Println(obj.GetMinKey(), obj.GetMaxKey())
 }
 
 //leetcode submit region begin(Prohibit modification and deletion)
+// 双链表
+type node struct {
+	keys map[string]bool
+	val  int
+}
+
 type AllOne struct {
-	h   map[string]*Node
-	dll *doubleLinkList
-}
-
-type doubleLinkList struct {
-	head *Node
-	tail *Node
-}
-
-type Node struct {
-	Next *Node
-	Pre  *Node
-	Key  map[string]bool
-	Val  int
+	*list.List
+	nodes map[string]*list.Element
 }
 
 func Constructor() AllOne {
 	return AllOne{
-		h: map[string]*Node{},
-		dll: &doubleLinkList{
-			head: nil,
-			tail: nil,
-		},
+		list.New(),
+		map[string]*list.Element{},
 	}
 }
 
 func (t *AllOne) Inc(key string) {
-	// init
-	if t.h[key] == nil {
-		if t.dll.head == nil {
-			ne := &Node{
-				nil,
-				nil,
-				map[string]bool{key: true},
-				1,
-			}
-			t.dll.head = ne
-			t.dll.tail = ne
-			t.h[key] = ne
-		} else if t.dll.head.Val == 1 {
-			t.dll.head.Key[key] = true
-			t.h[key] = t.dll.head
+	cur := t.nodes[key]
+
+	if cur == nil {
+		if t.Front() == nil || t.Front().Value.(node).val > 1 {
+			t.nodes[key] = t.PushFront(node{map[string]bool{key: true}, 1})
 		} else {
-			ne := &Node{
-				t.dll.head,
-				nil,
-				map[string]bool{key: true},
-				1,
-			}
-			t.dll.head.Pre = ne
-			t.dll.head = ne
-			t.h[key] = ne
+			t.Front().Value.(node).keys[key] = true
+			t.nodes[key] = t.Front()
 		}
 		return
 	}
 
-	delete(t.h[key].Key, key)
-	pre := t.h[key]
-
-	if pre.Next == nil {
-		pre.Next = &Node{
-			nil,
-			pre,
-			map[string]bool{key: true},
-			pre.Val + 1,
-		}
-		t.dll.tail = pre.Next
-	} else if pre.Next.Val > pre.Val+1 {
-		ne := &Node{
-			pre.Next,
-			pre,
-			map[string]bool{key: true},
-			pre.Val + 1,
-		}
-		pre.Next.Pre = ne
-		pre.Next = ne
+	nxt := cur.Next()
+	cn := cur.Value.(node)
+	if nxt == nil || nxt.Value.(node).val > cn.val+1 {
+		t.nodes[key] = t.InsertAfter(node{map[string]bool{key: true}, cn.val + 1}, cur)
 	} else {
-		pre.Next.Key[key] = true
+		nxt.Value.(node).keys[key] = true
+		t.nodes[key] = nxt
 	}
-	t.h[key] = pre.Next
-
-	if len(pre.Key) == 0 {
-		if t.dll.head == pre {
-			t.dll.head = pre.Next
-		}
-		delNode(pre)
+	delete(cn.keys, key)
+	if len(cn.keys) == 0 {
+		t.Remove(cur)
 	}
 }
 
 func (t *AllOne) Dec(key string) {
-	cur := t.h[key]
-	delete(cur.Key, key)
+	cur := t.nodes[key]
 
-	//fmt.Println("dec", key)
-	if cur.Val == 1 {
-		t.h[key] = nil
-	} else if cur.Pre == nil {
-		//fmt.Println("pre nil ", key)
-		ne := &Node{
-			cur,
-			nil,
-			map[string]bool{key: true},
-			cur.Val - 1,
-		}
-		cur.Pre = ne
-		t.dll.head = ne
-		t.h[key] = ne
-	} else if cur.Pre.Val == cur.Val-1 {
-		//fmt.Println("cpv", key)
-		cur.Pre.Key[key] = true
-		t.h[key] = cur.Pre
+	cn := cur.Value.(node)
+	pre := cur.Prev()
+	if cn.val == 1 {
+		delete(t.nodes, key)
+	} else if pre == nil || pre.Value.(node).val < cn.val-1 {
+		t.nodes[key] = t.InsertBefore(node{map[string]bool{key: true}, cn.val - 1}, cur)
 	} else {
-		//fmt.Println("else ")
-		ne := &Node{
-			cur,
-			cur.Pre,
-			map[string]bool{key: true},
-			cur.Val - 1,
-		}
-		cur.Pre.Next = ne
-		cur.Pre = ne
-		t.h[key] = ne
+		pre.Value.(node).keys[key] = true
+		t.nodes[key] = pre
 	}
 
-	if len(cur.Key) == 0 {
-		if t.dll.tail == cur {
-			t.dll.tail = cur.Pre
-		}
-		if t.dll.head == cur {
-			t.dll.head = t.dll.head.Next
-		}
-
-		delNode(cur)
+	delete(cn.keys, key)
+	if len(cn.keys) == 0 {
+		t.Remove(cur)
 	}
-
-	//fmt.Println(t.dll, t.h[key])
 }
 
 func (t *AllOne) GetMaxKey() string {
-	if t.dll.tail == nil {
-		return ""
-	}
-	for x, _ := range t.dll.tail.Key {
-		return x
+	if b := t.Back(); b != nil {
+		for x, _ := range b.Value.(node).keys {
+			return x
+		}
 	}
 	return ""
 }
 
 func (t *AllOne) GetMinKey() string {
-	if t.dll.head == nil {
-		return ""
-	}
-	for x, _ := range t.dll.head.Key {
-		return x
+	if f := t.Front(); f != nil {
+		for x, _ := range f.Value.(node).keys {
+			return x
+		}
 	}
 	return ""
-}
-
-func delNode(p *Node) {
-	if p.Pre != nil {
-		p.Pre.Next = p.Next
-	}
-	if p.Next != nil {
-		p.Next.Pre = p.Pre
-	}
 }
 
 /**
