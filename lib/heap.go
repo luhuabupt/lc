@@ -32,6 +32,19 @@ func (h *hl) Pop() interface{} {
 	return v
 }
 
+type ht [][2]int
+
+func (h ht) Len() int            { return len(h) }
+func (h ht) Less(i, j int) bool  { return h[i][0] < h[j][0] } // 小顶堆
+func (h ht) Swap(i, j int)       { h[i], h[j] = h[j], h[i] }
+func (h *ht) Push(v interface{}) { *h = append(*h, v.([2]int)) }
+func (h *ht) Pop() interface{} {
+	a := *h
+	v := a[len(a)-1]
+	*h = a[:len(a)-1]
+	return v
+}
+
 type minHeap struct{ sort.IntSlice }
 
 func (minHeap) Push(interface{})     {}

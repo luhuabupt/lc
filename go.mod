@@ -1,5 +1,5 @@
 module main
 
-go 1.14
+go 1.16
 
-require github.com/bwmarrin/snowflake v0.3.0
+require github.com/emirpasic/gods v1.12.0
