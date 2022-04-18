@@ -30,13 +30,14 @@ func lowbit(v int) int {
 }
 
 func main() {
-	x := []int{0, 2, 1, 4, 3}
+	x := []int{1, 2, 3, 4, 5, 1}
 	t := tree{make([]int, len(x)+1)}
 
-	for _, v := range x {
-		v = v + 1
-		t.add(v, 1)
-		//fmt.Println(v, t.query(1, v-1))
+	for i, v := range x {
+		t.add(i+1, i+v+1000)
 	}
 	fmt.Println(t.arr)
+	fmt.Println(t.query(1, 2))
+	fmt.Println(t.query(2, 3))
+	fmt.Println(t.query(1, 5))
 }
