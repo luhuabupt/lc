@@ -1,7 +1,9 @@
-package lib
+package main
+
+import "fmt"
 
 func main() {
-	QuickPow(2, 5)
+	fmt.Println(QuickPow(2, 50))
 }
 
 func QuickPow(a, n int) int {
