@@ -3,6 +3,7 @@ package main
 import "fmt"
 
 func main() {
+	fmt.Println(lowBit(114514))
 	gospersHack(4, 0)
 	gospersHack(4, 1)
 	gospersHack(4, 2)

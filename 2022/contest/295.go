@@ -13,6 +13,31 @@ func main() {
 	fmt.Println(totalSteps([]int{5, 3, 4, 4, 7, 3, 6, 11, 8, 5, 11})) //3
 }
 
+func totalSteps(a []int) int {
+	type node struct {
+		v  int
+		nx *node
+	}
+	max := func(a, b int) int {
+		if a > b {
+			return a
+		}
+		return b
+	}
+	cal := func(ar []int) int {
+		return 0
+	}
+
+	ans := 0
+	t, pre := node{}, a[0]
+	for _, x := range a {
+
+	}
+	ans = max(ans, cal(t))
+
+	return ans
+}
+
 func rearrangeCharacters(s string, target string) int {
 	c := [26]int{}
 	for _, v := range s {
@@ -46,7 +71,7 @@ func discountPrices(s string, d int) string {
 	return strings.Join(a, " ")
 }
 
-func totalSteps(a []int) int {
+func totalSteps_(a []int) int {
 	max := func(a, b int) int {
 		if a > b {
 			return a
