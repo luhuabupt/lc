@@ -6,10 +6,12 @@ func main() {
 	//fmt.Println(canChange("_L__R__R_", "L______RR"))
 	fmt.Println(idealArrays(2, 5))
 	fmt.Println(idealArrays(5, 3))
+	fmt.Println(idealArrays(5, 9)) // 111
 }
 
 func idealArrays(n int, ma int) int {
 	M := int(1e9) + 7
+
 	cal := func(v int) []int {
 		r := []int{}
 		for i := 1; i*i <= v; i++ {
@@ -24,27 +26,37 @@ func idealArrays(n int, ma int) int {
 		}
 		return r
 	}
-	cn1i := func(v int) int { // C n-1 v
-		if v == n-1 {
+
+	cd := make([][]int, n+20)
+	for i := 0; i < len(cd); i++ {
+		cd[i] = make([]int, 16)
+	}
+	var cnm func(a, b int) int
+	cnm = func(a, b int) int {
+		if b > a {
+			return 0
+		}
+		if b == 0 {
 			return 1
 		}
-		if v == 1 {
+		if b == 1 {
+			return a
+		}
+		if a == b {
 			return 1
 		}
-		r, x := 1, 1
-		for i := 1; i <= v; i++ {
-			x *= i
+		if cd[a][b] > 0 {
+			return cd[a][b]
 		}
-		for i := 1; i <= v; i++ {
-			r *= n - i
-		}
-		return r / x
+		x := cnm(a, b-1) + cnm(a-1, b)
+		cd[a][b] = x % M
+		return x
 	}
 
 	ans := 0
 	d := make([][]int, ma+1)
 	for i := 1; i <= ma; i++ {
-		d[i] = make([]int, 202)
+		d[i] = make([]int, 16)
 	}
 	for i := 1; i <= ma; i++ {
 		c := cal(i)
@@ -61,15 +73,12 @@ func idealArrays(n int, ma int) int {
 			}
 		}
 		fmt.Println(i, c, d[i])
-		for i := 1; i <= ma; i++ {
-			for j := 1; j < 202; j++ {
-				if d[i][j] == 0 {
-					break
-				}
-				fmt.Println(i, j, d[i][j] * cn1i(j-1))
-				ans += d[i][j] * cn1i(j)
-				ans %= M
+		for j := 1; j < 16; j++ {
+			if d[i][j] == 0 {
+				break
 			}
+			ans += d[i][j] * cnm(n-1, j-1)
+			ans %= M
 		}
 	}
 	return ans
