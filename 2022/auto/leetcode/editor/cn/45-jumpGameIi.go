@@ -3,7 +3,6 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Println(jump([]int{1, 2, 3}))
 }
 
 //leetcode submit region begin(Prohibit modification and deletion)

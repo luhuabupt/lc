@@ -9,7 +9,6 @@ func main() {
 	//fmt.Println(minSumSquareDiff([]int{1, 4, 10, 12}, []int{5, 8, 6, 9}, 3, 1))
 	//fmt.Println(minSumSquareDiff([]int{10, 10, 10, 11, 5}, []int{1, 0, 6, 6, 1}, 11, 27)) // 0
 	fmt.Println(validSubarraySize([]int{1, 3, 4, 3, 1}, 6))
-	fmt.Println(validSubarraySize([]int{6, 5, 6, 5, 7}, 7))
 }
 
 func validSubarraySize(a []int, ts int) int {

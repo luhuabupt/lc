@@ -31,7 +31,7 @@ func maxSubarraySumCircular(a []int) int {
 		}
 	}
 
-	if sum-miSum > ans {
+	if sum - miSum > ans {
 		ans = sum - miSum
 	}
 

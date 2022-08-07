@@ -72,7 +72,7 @@ func highestRankedKItems(grid [][]int, pricing []int, start []int, k int) [][]in
 
 func numberOfWays(corridor string) int {
 	n := len(corridor)
-	M := int(1e9 + 7)
+	M := int(1E9 + 7)
 
 	sum := strings.Count(corridor, "S")
 	if sum == 0 || sum&1 == 1 {

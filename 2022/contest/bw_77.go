@@ -69,7 +69,7 @@ func maximumMinutes(g [][]int) int {
 					//fmt.Println(x, y, dp[i][j]+1, f[x][y])
 					if g[x][y] == 0 &&
 						(dp[i][j]+1 < f[x][y] || f[x][y] == -1 || (x == m-1 && y == n-1 && dp[i][j]+1 == f[x][y])) &&
-						dp[x][y] == 0 { // grass && arrive < fire
+						dp[x][y] == 0 {       // grass && arrive < fire
 						if x == 0 && y == 0 { // 不能回到0,0
 							continue
 						}

@@ -1,7 +1,6 @@
 package main
 
 func main() {
-
 }
 
 //leetcode submit region begin(Prohibit modification and deletion)
@@ -20,5 +19,4 @@ func solveSudoku(board [][]byte) {
 
 	dfs(board, 0, 0)
 }
-
 //leetcode submit region end(Prohibit modification and deletion)

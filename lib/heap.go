@@ -56,6 +56,7 @@ func (h maxHeap) Less(i, j int) bool { return h.IntSlice[i] > h.IntSlice[j] }
 func (maxHeap) Push(interface{})     {}
 func (maxHeap) Pop() (_ interface{}) { return }
 
+
 // @see http://cngolib.com/container-heap.html
 func main() {
 	arr()

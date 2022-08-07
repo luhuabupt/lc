@@ -36,9 +36,6 @@ func numPermsDISequence_(s string) int {
 }
 
 func numPermsDISequence(s string) int {
-	M := int(1e9) + 7
-	vis := map[string]int{"D": 1, "I": 1, "": 1}
-
 	cnt := 0
 	var dfs func(s string) int
 	dfs = func(s string) int {

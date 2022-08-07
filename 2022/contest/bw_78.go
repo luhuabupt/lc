@@ -78,15 +78,15 @@ func maximumWhiteTiles(t [][]int, c int) int {
 
 	for i, v := range t {
 		do := c
-		if i == n-1 || v[0]+c <= t[i+1][0] {
-			do = v[1] - v[0] + 1
+		if i == n-1 || v[0] + c <= t[i+1][0] {
+			do = v[1]-v[0]+1
 		} else {
-			r := v[0] + c - 1
+			r := v[0] + c -1
 			x := sort.Search(n, func(f int) bool {
 				return t[f][1] >= v[0]+c
 			})
 			if x == n {
-				do -= w[n-1] + r - t[n-1][1]
+				do -= w[n-1] + r-t[n-1][1]
 			} else {
 				do -= w[x]
 				if r < t[x][0] {

@@ -11,7 +11,7 @@ func main() {
 //leetcode submit region begin(Prohibit modification and deletion)
 func numMusicPlaylists(n int, l int, k int) int {
 	dp := make([][]int, l)
-	M := int(1e9 + 7)
+	M := int(1E9 + 7)
 
 	for i := 0; i < l; i++ {
 		dp[i] = make([]int, n+1)

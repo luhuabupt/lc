@@ -3,8 +3,7 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Println(largestRectangleArea([]int{2, 1, 5, 6, 2, 3}))
-	fmt.Println(largestRectangleArea([]int{2, 4}))
+
 }
 
 //leetcode submit region begin(Prohibit modification and deletion)
@@ -26,7 +25,7 @@ func largestRectangleArea(heights []int) int {
 	}
 
 	st = []int{}
-	for i := n - 1; i >= 0; i-- {
+
 		v := heights[i]
 
 		for len(st) > 0 && v <= heights[st[len(st)-1]] {
@@ -42,7 +41,6 @@ func largestRectangleArea(heights []int) int {
 
 	ans := 0
 	for i, v := range heights {
-		x := v * (r[i] - l[i] - 1)
 		if x > ans {
 			ans = x
 		}
@@ -50,5 +48,4 @@ func largestRectangleArea(heights []int) int {
 
 	return ans
 }
-
 //leetcode submit region end(Prohibit modification and deletion)

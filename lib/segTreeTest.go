@@ -14,6 +14,7 @@ type sg []struct {
 	val  int
 }
 
+// ((
 func (t sg) op(x, y int) int {
 	return x + y
 }
@@ -21,6 +22,8 @@ func (t sg) op(x, y int) int {
 func (t sg) set(o, v int) {
 	t[o].val = v
 }
+
+// ))
 
 func (t sg) maintain(o int) {
 	ls, rs := t[o<<1], t[o<<1+1]

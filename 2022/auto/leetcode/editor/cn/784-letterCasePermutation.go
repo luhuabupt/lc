@@ -23,5 +23,4 @@ func letterCasePermutation(s string) (ans []string) {
 
 	return ans
 }
-
 //leetcode submit region end(Prohibit modification and deletion)

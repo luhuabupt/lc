@@ -3,7 +3,6 @@ package main
 import "container/heap"
 
 func main() {
-
 }
 
 //leetcode submit region begin(Prohibit modification and deletion)
@@ -22,7 +21,7 @@ func (h *h) Pop() interface{} {
 
 func magicTower(nums []int) int {
 	sum := 1
-	for _, x := range nums {
+	for _,x := range nums {
 		sum += x
 	}
 	if sum <= 0 {
@@ -49,5 +48,4 @@ func magicTower(nums []int) int {
 
 	return ans
 }
-
 //leetcode submit region end(Prohibit modification and deletion)

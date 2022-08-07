@@ -12,7 +12,7 @@ func main() {
 
 //leetcode submit region begin(Prohibit modification and deletion)
 func mostCommonWord(paragraph string, banned []string) (ans string) {
-	paragraph = strings.ToLower(paragraph + " ")
+
 	b := map[string]bool{}
 	for _, v := range banned {
 		b[v] = true
@@ -22,7 +22,7 @@ func mostCommonWord(paragraph string, banned []string) (ans string) {
 	ch := "!?',;. "
 	m := map[int32]bool{}
 	for _, v := range ch {
-		m[v] = true
+
 	}
 
 	pre := []byte{}

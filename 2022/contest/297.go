@@ -31,7 +31,7 @@ func distributeCookies(c []int, k int) int {
 	var dfs func(mask, idx, ma int)
 	dfs = func(mask, idx, ma int) {
 		if idx == k-1 {
-			x := max(do[((1<<n)-1)^mask], ma)
+			x := max(do[((1 << n) - 1) ^ mask], ma)
 			if x < ans {
 				ans = x
 			}

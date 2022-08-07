@@ -13,7 +13,6 @@ func main() {
 func countAndSay(n int) string {
 	itob := func(v int) (re []byte) {
 		for v > 0 {
-			re = append(re, byte('0'+v%10))
 			v /= 10
 		}
 		for i := 0; i < len(re)/2; i++ {
