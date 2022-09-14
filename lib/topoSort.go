@@ -49,3 +49,79 @@ func topoSort(a [][]int, all []int) []int {
 
 	return ans
 }
+
+func topoSortN(a [][]int, n int) []int {
+	ans := []int{}
+
+	in := make([]int, n)
+	nx := make([][]int, n)
+	for _, v := range a {
+		in[v[1]]++
+		nx[v[0]] = append(nx[v[0]], v[1])
+	}
+
+	s := []int{}
+	for i := 0; i < n; i++ {
+		if in[i] == 0 {
+			s = append(s, i)
+		}
+	}
+
+	for len(s) > 0 {
+		ns := []int{}
+		for _, x := range s {
+			ans = append(ans, x)
+			for _, v := range nx[x] {
+				in[v]--
+				if in[v] == 0 {
+					ns = append(ns, v)
+				}
+			}
+		}
+		s = ns
+	}
+
+	if n != len(ans) {
+		return []int{}
+	}
+
+	return ans
+}
+
+func topoSortNPlus(a [][]int, n int) []int {
+	ans := []int{}
+
+	in := make([]int, n)
+	nx := make([][]int, n)
+	for _, v := range a {
+		in[v[1]-1]++
+		nx[v[0]-1] = append(nx[v[0]-1], v[1]-1)
+	}
+
+	s := []int{}
+	for i := 0; i < n; i++ {
+		if in[i] == 0 {
+			s = append(s, i)
+		}
+	}
+
+	for len(s) > 0 {
+		ns := []int{}
+		for _, x := range s {
+			ans = append(ans, x+1)
+			for _, v := range nx[x] {
+				in[v]--
+				if in[v] == 0 {
+					ns = append(ns, v)
+				}
+			}
+		}
+		s = ns
+	}
+
+	if n != len(ans) {
+		return []int{}
+	}
+
+	return ans
+}
