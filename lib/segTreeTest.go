@@ -1,7 +1,12 @@
 package main
 
-func main() {
+import "fmt"
 
+func main() {
+	a := []int{1, 2, 3, 4}
+	t := make(sg, 4*len(a))
+	t.build(a, 1, 1, len(a))
+	fmt.Println(t.query(1, 1, 4))
 }
 
 func newSgTree(a []int) {
