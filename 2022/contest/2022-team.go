@@ -6,6 +6,47 @@ func main() {
 	fmt.Println(composeCube([][]string{{"000", "110", "000"}, {"110", "011", "000"}, {"110", "011", "110"}, {"000", "010", "111"}, {"011", "111", "011"}, {"011", "010", "000"}}))
 }
 
+func beautifulBouquet(f []int, cnt int) int {
+	n := len(f)
+	c := make([]int, 1e5+1)
+	ans := 0
+	M := int(1e9) + 7
+
+	for l, r := 0, 0; r < n; r++ {
+		v := f[r]
+		c[v]++
+		if c[v] > cnt {
+
+		}
+	}
+
+	for l, r := 0, 0; r < n; r++ {
+		v := f[r]
+		c[v]++
+		if c[v] > cnt {
+			for l < r {
+				ans += r - l
+				ans %= M
+
+				c[f[l]]--
+				if f[l] == v {
+					l++
+					break
+				}
+				l++
+			}
+		}
+		if r == n-1 {
+			for ; l < n; l++ {
+				ans += r - l + 1
+				ans %= M
+			}
+		}
+	}
+
+	return ans
+}
+
 func composeCube(sp [][]string) bool {
 	cnt := 0
 	n := len(sp[0])

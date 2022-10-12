@@ -33,22 +33,13 @@ func minSupplyStationNumber(root *TreeNode) int {
 		return b
 	}
 
-	var dfs func(p *TreeNode, a int) int
-	dfs = func(p *TreeNode, a int) int {
+	var dfs func(p *TreeNode) (int, int, int) // 0 1 2
+	dfs = func(p *TreeNode) (int, int, int) {
 		if p == nil {
-			return 0
+			return 100001, 100001, 100001
 		}
 		if p.Left == nil && p.Right == nil {
-			return 1 - (a & 1)
-		}
-
-		x := 1 + dfs(p.Left, 1) + dfs(p.Right, 1) // 1
-
-		y := 100001
-		if a&1 > 0 || a&2 > 0 {
-			a <<= 1
-			a %= 16
-			y = dfs(p.Left, a) + dfs(p.Right, a) // 0
+			return 100001, 100001, 1
 		}
 
 		return min(x, y)
