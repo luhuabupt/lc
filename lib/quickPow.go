@@ -17,3 +17,17 @@ func QuickPow(a, n int) int {
 	}
 	return ans
 }
+
+func QuickPowMod(a, n, m int) int {
+	ans := 1
+	for n > 0 {
+		if n&1 > 0 {
+			ans *= a
+			ans %= m
+		}
+		a *= a
+		a %= m
+		n /= 2
+	}
+	return ans
+}
