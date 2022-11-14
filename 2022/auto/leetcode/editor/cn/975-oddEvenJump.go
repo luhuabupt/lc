@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	rbt "github.com/emirpasic/gods/trees/redblacktree"
+	"github.com/emirpasic/gods/trees/redblacktree"
 )
 
 func main() {
@@ -22,10 +22,18 @@ func oddEvenJumps(a []int) int {
 		ge[i] = -1
 	}
 
-	t := rbt.NewWithIntComparator()
+	t := redblacktree.NewWithIntComparator()
 	for i := n - 1; i >= 0; i-- {
-		t.Put(a[i], "")
-		t.Get(a[i])
+		l, has := t.Floor(a[i])
+		if has {
+			le[i] = l.Value.(int)
+		}
+		r, has := t.Ceiling(a[i])
+		if has {
+			ge[i] = r.Value.(int)
+		}
+
+		t.Put(a[i], i)
 	}
 
 	dp := make([][2]bool, n)

@@ -101,56 +101,48 @@ func busiestServers(k int, a []int, load []int) []int {
 	return ans
 }
 
-func busiestServers_(k int, a []int, load []int) []int {
-	n := len(a)
-	do := make([]int, k)
-	free := redblacktree.NewWithIntComparator()
-
-	h := &ht{}
-	for i := 0; i < k && i < n; i++ {
-		heap.Push(h, [2]int{a[i] + load[i], i})
-		do[i]++
+// official redBlackTree
+func busiestServers_(k int, arrival, load []int) (ans []int) {
+	available := redblacktree.NewWithIntComparator()
+	for i := 0; i < k; i++ {
+		available.Put(i, nil)
 	}
-
-	for i := k; i < n; i++ {
-		for h.Len() > 0 {
-			cur := heap.Pop(h).([2]int)
-			if cur[0] <= a[i] {
-				free.Put(cur[1], nil)
-			} else {
-				heap.Push(h, cur)
-				break
-			}
+	busy := hp{}
+	requests := make([]int, k)
+	maxRequest := 0
+	for i, t := range arrival {
+		for len(busy) > 0 && busy[0].end <= t {
+			available.Put(busy[0].id, nil)
+			heap.Pop(&busy)
 		}
-
-		if free.Size() == 0 {
+		if available.Size() == 0 {
 			continue
 		}
-
-		use, _ := free.Ceiling(i % k)
-		if use == nil {
-			use = free.Left()
+		node, _ := available.Ceiling(i % k)
+		if node == nil {
+			node = available.Left()
 		}
-
-		heap.Push(h, [2]int{a[i] + load[i], use.Key.(int)})
-		do[use.Key.(int)]++
-		fmt.Println(i, use.Key.(int), free.Size())
-		free.Remove(use.Key)
-	}
-
-	ma, ans := 0, []int{}
-	for _, v := range do {
-		if v > ma {
-			ma = v
+		id := node.Key.(int)
+		requests[id]++
+		if requests[id] > maxRequest {
+			maxRequest = requests[id]
+			ans = []int{id}
+		} else if requests[id] == maxRequest {
+			ans = append(ans, id)
 		}
+		heap.Push(&busy, pair{t + load[i], id})
+		available.Remove(id)
 	}
-	for i, v := range do {
-		if v == ma {
-			ans = append(ans, i)
-		}
-	}
-
-	return ans
+	return
 }
+
+type pair struct{ end, id int }
+type hp []pair
+
+func (h hp) Len() int            { return len(h) }
+func (h hp) Less(i, j int) bool  { return h[i].end < h[j].end }
+func (h hp) Swap(i, j int)       { h[i], h[j] = h[j], h[i] }
+func (h *hp) Push(v interface{}) { *h = append(*h, v.(pair)) }
+func (h *hp) Pop() interface{}   { a := *h; v := a[len(a)-1]; *h = a[:len(a)-1]; return v }
 
 //leetcode submit region end(Prohibit modification and deletion)
