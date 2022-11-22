@@ -44,7 +44,7 @@ func checkValid(matrix [][]int) bool {
 	return true
 }
 
-func minSwaps(nums []int) int {
+func minSwaps_(nums []int) int {
 	n := len(nums)
 	cnt, max := 0, 0
 	for _, v := range nums {
