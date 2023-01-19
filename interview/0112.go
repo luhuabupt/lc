@@ -12,4 +12,6 @@ func main() {
 
 	a := []string{}
 	b := append(a[:0:0], a...)
+
+	fmt.Println(b)
 }
