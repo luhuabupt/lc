@@ -1,16 +1,28 @@
 package main
 
-func main() {
-	ch := make(chan int, 2)
-	ch <- 3
-	ch <- 3
+import "fmt"
 
-	select {
-	case i := <-ch:
-		println(i)
-	case i := <-ch:
-		println(i + 1)
-	default:
-		println("default")
+func main() {
+	for i := 0; i < 10; i++ {
+		test()
 	}
+}
+
+func test() {
+	ch := make(chan int, 2)
+	go func() { ch <- 3 }()
+	go func() { ch <- 4 }()
+
+	ans := []int{}
+	for len(ans) < 2 {
+		select {
+		case i := <-ch:
+			ans = append(ans, i)
+		case i := <-ch:
+			ans = append(ans, i*2)
+		}
+	}
+	close(ch)
+
+	fmt.Println(ans)
 }
